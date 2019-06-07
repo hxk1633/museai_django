@@ -6,9 +6,13 @@ STATUS_CHOICES = [
     ('c', 'Created'),
 ]
 
+CATEGORIES = [
+    ("ART","art"),
+]
+
 # Create your models here.
-class Album(models.Model):
-    title = models.TextField()
+class Video(models.Model):
+    title = models.CharField(max_length=50)
     file = models.FileField(upload_to='videos/')
     status = models.CharField(max_length=1, choices=STATUS_CHOICES, default='t')
 
@@ -20,3 +24,10 @@ class Album(models.Model):
 
     def __str__(self):
         return self.title
+
+class Album(models.Model):
+    video = models.OneToOneField(Video, on_delete=models.CASCADE, primary_key=True)
+    category = models.CharField(max_length = 50, choices=CATEGORIES)
+
+    def __str__(self):
+        return self.video.title

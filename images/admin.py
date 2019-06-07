@@ -3,7 +3,7 @@ from ffmpy import FFmpeg
 import os
 
 # Register your models here.
-from .models import Album
+from .models import Video, Album
 
 
 def createAlbum(modeladmin, request, queryset):
@@ -18,9 +18,10 @@ def createAlbum(modeladmin, request, queryset):
 
 createAlbum.short_description = "Create album"
 
-class AlbumAdmin(admin.ModelAdmin):
+class VideoAdmin(admin.ModelAdmin):
     list_display = ['title', 'status']
     ordering = ['title']
     actions = [createAlbum]
 
-admin.site.register(Album, AlbumAdmin)
+admin.site.register(Video, VideoAdmin)
+admin.site.register(Album)
