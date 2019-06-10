@@ -5,7 +5,7 @@ import os
 # Register your models here.
 from .models import Video, Album
 
-
+"""
 def createAlbum(modeladmin, request, queryset):
     for video in queryset:
         queryset.filter(title=video.title).update(status='p')
@@ -17,11 +17,11 @@ def createAlbum(modeladmin, request, queryset):
         queryset.filter(title=video.title).update(status='c')
 
 createAlbum.short_description = "Create album"
-
 class VideoAdmin(admin.ModelAdmin):
     list_display = ['title', 'status']
     ordering = ['title']
     actions = [createAlbum]
+"""
 
-admin.site.register(Video, VideoAdmin)
+admin.site.register(Video)
 admin.site.register(Album)
