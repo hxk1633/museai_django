@@ -10,10 +10,6 @@ STATUS_CHOICES = [
     ('c', 'Created'),
 ]
 
-CATEGORIES = [
-    ("ART","art"),
-]
-
 def zip_folder(folder_path, output_path):
     """Zip the contents of an entire folder (with that folder included
     in the archive). Empty subfolders will be included in the archive
@@ -49,29 +45,46 @@ def zip_folder(folder_path, output_path):
         zip_file.close()
 
 def convertVideo(video):
-    os.mkdir('media/albums/' + video.getFileName())
+    os.mkdir('media/albums/' + video.getAlbumName() + "/" + video.getFileName())
     convert = FFmpeg(inputs={video.getFilePath(): None}, outputs={"media/videos/" + video.getFileName() + ".mp4": None})
-    ff = FFmpeg(inputs={"media/videos/" + video.getFileName() + ".mp4": None}, outputs={"media/albums/" + video.getFileName() + "/" + video.getFileName() + "%d.png": ['-vf', 'fps=10']})
+    ff = FFmpeg(inputs={"media/videos/" + video.getFileName() + ".mp4": None}, outputs={"media/albums/" + video.getAlbumName() + "/" + video.getFileName() + "/" + video.getFileName() + "%d.png": ['-vf', 'fps=10']})
     convert.run()
     ff.run()
     zip_folder("media/albums/"+video.getFileName(), "media/albums/"+video.getFileName()+".zip")
 
 # Create your models here.
+
+class Album(models.Model):
+    name = models.CharField(max_length=50, default="")
+    description = models.CharField(max_length=255, blank=True)
+    pin = models.CharField(max_length=50, default="")
+
+    def save(self, *args, **kwargs):
+        super(Album, self).save(*args, **kwargs)
+        os.mkdir("media/albums/" + self.name)
+
+    def __str__(self):
+        return self.name
+
+
 class Video(models.Model):
     title = models.CharField(max_length=50)
     file = models.FileField(upload_to='videos/')
+    album = models.OneToOneField(Album, on_delete=models.CASCADE, primary_key=True)
     status = models.CharField(max_length=1, choices=STATUS_CHOICES, default='t')
 
     def getFilePath(self):
-        print(self.file.path)
         return self.file.path
 
     def getFileName(self):
         return self.file.name.split("/")[1].split(".")[0]
 
-    def getAlbum(self):
+    def getImages(self):
         name = getFileName()
         return "media/albums/" + name + ".zip"
+
+    def getAlbumName(self):
+        return self.album.name
 
     def save(self, *args, **kwargs):
         print("Converting video")
@@ -81,10 +94,3 @@ class Video(models.Model):
 
     def __str__(self):
         return self.title
-
-class Album(models.Model):
-    video = models.OneToOneField(Video, on_delete=models.CASCADE, primary_key=True)
-    category = models.CharField(max_length = 50, choices=CATEGORIES)
-
-    def __str__(self):
-        return self.video.title
