@@ -76,9 +76,9 @@ class Album(models.Model):
 
 class Video(models.Model):
     title = models.CharField(max_length=50)
-    file = models.FileField(upload_to='videos/')
+    file = models.FileField(upload_to='videos/', blank=True)
     album = models.ForeignKey(Album, on_delete=models.CASCADE)
-    id = models.AutoField(primary_key=True, default=1)
+    #id = models.AutoField(primary_key=True, default=1)
 
     def getFilePath(self):
         return self.file.path
@@ -101,3 +101,9 @@ class Video(models.Model):
 
     def __str__(self):
         return self.title
+
+class VideoFile(models.Model):
+    file = models.FileField(upload_to='videos/')
+
+    def __str__(self):
+        return self.file.name
