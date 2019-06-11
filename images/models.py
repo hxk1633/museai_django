@@ -10,6 +10,11 @@ STATUS_CHOICES = [
     ('c', 'Created'),
 ]
 
+ALBUM_STATUS = [
+    ('o', 'Open'),
+    ('c', 'Closed'),
+]
+
 def zip_folder(folder_path, output_path):
     """Zip the contents of an entire folder (with that folder included
     in the archive). Empty subfolders will be included in the archive
@@ -50,18 +55,20 @@ def convertVideo(video):
     ff = FFmpeg(inputs={"media/videos/" + video.getFileName() + ".mp4": None}, outputs={"media/albums/" + video.getAlbumName() + "/" + video.getFileName() + "/" + video.getFileName() + "%d.png": ['-vf', 'fps=10']})
     convert.run()
     ff.run()
-    zip_folder("media/albums/"+video.getFileName(), "media/albums/"+video.getFileName()+".zip")
+    zip_folder("media/albums/"+video.getFileName(), "media/albums/" +video.getAlbumName()+"/"+video.getFileName()+".zip")
 
 # Create your models here.
 
 class Album(models.Model):
-    name = models.CharField(max_length=50, default="")
-    description = models.CharField(max_length=255, blank=True)
-    pin = models.CharField(max_length=50, default="")
+    name = models.CharField(max_length=50)
+    description = models.CharField(max_length=255)
+    pin = models.CharField(max_length=50)
+    status = models.CharField(max_length=1, choices=ALBUM_STATUS, default='o')
+    id = models.AutoField(primary_key=True, default=2)
 
     def save(self, *args, **kwargs):
-        super(Album, self).save(*args, **kwargs)
         os.mkdir("media/albums/" + self.name)
+        super(Album, self).save(*args, **kwargs)
 
     def __str__(self):
         return self.name
@@ -70,8 +77,8 @@ class Album(models.Model):
 class Video(models.Model):
     title = models.CharField(max_length=50)
     file = models.FileField(upload_to='videos/')
-    album = models.OneToOneField(Album, on_delete=models.CASCADE, primary_key=True)
-    status = models.CharField(max_length=1, choices=STATUS_CHOICES, default='t')
+    album = models.ForeignKey(Album, on_delete=models.CASCADE)
+    id = models.AutoField(primary_key=True, default=1)
 
     def getFilePath(self):
         return self.file.path
