@@ -51,7 +51,8 @@ def zip_folder(folder_path, output_path):
 
 def convertVideo(video):
     os.mkdir('media/albums/' + video.getAlbumName() + "/" + video.getFileName())
-    convert = FFmpeg(inputs={video.getFilePath(): None}, outputs={"media/videos/" + video.getFileName() + ".mp4": None})
+    #convert = FFmpeg(inputs={video.getFilePath(): None}, outputs={"media/videos/" + video.getFileName() + ".mp4": None})
+    convert = FFmpeg(inputs={"media/videos/" + video.getFileName() + ".MOV": None}, outputs={"media/videos/" + video.getFileName() + ".mp4": None})
     ff = FFmpeg(inputs={"media/videos/" + video.getFileName() + ".mp4": None}, outputs={"media/albums/" + video.getAlbumName() + "/" + video.getFileName() + "/" + video.getFileName() + "%d.png": ['-vf', 'fps=10']})
     convert.run()
     ff.run()
@@ -73,18 +74,16 @@ class Album(models.Model):
     def __str__(self):
         return self.name
 
-
 class Video(models.Model):
     title = models.CharField(max_length=50)
-    file = models.FileField(upload_to='videos/', blank=True)
+    file = models.FileField(upload_to='videos/')
     album = models.ForeignKey(Album, on_delete=models.CASCADE)
-    #id = models.AutoField(primary_key=True, default=1)
 
     def getFilePath(self):
         return self.file.path
 
     def getFileName(self):
-        return self.file.name.split("/")[1].split(".")[0]
+        return self.file.name.split("/")[-1].split(".")[0]
 
     def getImages(self):
         name = getFileName()
@@ -99,11 +98,19 @@ class Video(models.Model):
         convertVideo(self)
         print("Conversion successful")
 
+    @classmethod
+    def create(cls, title, file, pin):
+        album = Album.objects.get(pin=pin)
+        video = cls(title=title, file=file, album=album)
+        return video
+
     def __str__(self):
         return self.title
 
 class VideoFile(models.Model):
+    title = models.CharField(max_length=50, default="")
     file = models.FileField(upload_to='videos/')
+    pin = models.CharField(max_length=50, default="")
 
     def __str__(self):
         return self.file.name

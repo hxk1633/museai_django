@@ -31,9 +31,20 @@ class AlbumViewSet(viewsets.ModelViewSet):
 class FileUploadView(APIView):
     parser_classes = (MultiPartParser, FormParser)
     def post(self, request, *args, **kwargs):
+        """
+        serializer_context = {
+            'request': request,
+        }
+        """
         file_serializer = FileSerializer(data=request.data)
         if file_serializer.is_valid():
             file_serializer.save()
+            video = Video.create(file_serializer.data['title'], file_serializer.data['file'], file_serializer.data['pin'])
+            print(file_serializer.data['file'])
+            print(video.getFileName())
+            print(video.getAlbumName())
+            #print(video.getFilePath())
+            video.save()
             return Response(file_serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(file_serializer.errors, status=status.HTTP_400_BAD_REQUEST)

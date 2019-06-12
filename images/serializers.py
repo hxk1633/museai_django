@@ -17,4 +17,4 @@ class AlbumSerializer(serializers.HyperlinkedModelSerializer):
 class FileSerializer(serializers.ModelSerializer):
     class Meta:
         model = VideoFile
-        fields = "__all__"
+        fields = ('title', 'file', 'pin')
