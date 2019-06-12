@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import F
 from ffmpy import FFmpeg
 import os
 import sys
@@ -50,13 +51,13 @@ def zip_folder(folder_path, output_path):
         zip_file.close()
 
 def convertVideo(video):
-    os.mkdir('media/albums/' + video.getAlbumName() + "/" + video.getFileName())
+    os.mkdir('media/albums/' + video.getAlbumName() + "/data/images/" + video.getFileName())
     #convert = FFmpeg(inputs={video.getFilePath(): None}, outputs={"media/videos/" + video.getFileName() + ".mp4": None})
     convert = FFmpeg(inputs={"media/videos/" + video.getFileName() + ".MOV": None}, outputs={"media/videos/" + video.getFileName() + ".mp4": None})
-    ff = FFmpeg(inputs={"media/videos/" + video.getFileName() + ".mp4": None}, outputs={"media/albums/" + video.getAlbumName() + "/" + video.getFileName() + "/" + video.getFileName() + "%d.png": ['-vf', 'fps=10']})
+    ff = FFmpeg(inputs={"media/videos/" + video.getFileName() + ".mp4": None}, outputs={"media/albums/" + video.getAlbumName() + "/data/images/" + video.getFileName() + "/" + video.getFileName() + "%d.png": ['-vf', 'fps=5']})
     convert.run()
     ff.run()
-    zip_folder("media/albums/"+video.getFileName(), "media/albums/" +video.getAlbumName()+"/"+video.getFileName()+".zip")
+    #zip_folder("media/albums/"+video.getFileName(), "media/albums/" +video.getAlbumName()+"/data/images"+video.getFileName()+".zip")
 
 # Create your models here.
 
@@ -65,10 +66,13 @@ class Album(models.Model):
     description = models.CharField(max_length=255)
     pin = models.CharField(max_length=50)
     status = models.CharField(max_length=1, choices=ALBUM_STATUS, default='o')
+    video_count = models.IntegerField(default=0, editable=False)
     id = models.AutoField(primary_key=True, default=2)
 
     def save(self, *args, **kwargs):
         os.mkdir("media/albums/" + self.name)
+        os.mkdir("media/albums/" + self.name + "/data/")
+        os.mkdir("media/albums/" + self.name + "/data/images/")
         super(Album, self).save(*args, **kwargs)
 
     def __str__(self):
@@ -93,6 +97,7 @@ class Video(models.Model):
         return self.album.name
 
     def save(self, *args, **kwargs):
+        Album.objects.filter(name=self.album.name).update(video_count=F('video_count')+1)
         print("Converting video")
         super(Video, self).save(*args, **kwargs)
         convertVideo(self)
@@ -106,6 +111,15 @@ class Video(models.Model):
 
     def __str__(self):
         return self.title
+
+class TFModel(models.Model):
+    name = models.CharField(max_length=50)
+    album = models.OneToOneField(Album, on_delete=models.CASCADE)
+    object_count = models.IntegerField(max_length=5, editable=False, default=0)
+    accuracy = models.CharField(max_length=4, editable=False, default="100%")
+
+    def __str__(self):
+        return self.name
 
 class VideoFile(models.Model):
     title = models.CharField(max_length=50, default="")
