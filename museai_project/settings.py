@@ -25,7 +25,7 @@ SECRET_KEY = '4pp5qszp+rvtk0eaf0m79a(3k*&k8q)7nc37o75q#)h(0qix!#'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1']
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -34,6 +34,8 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10
 }
+
+DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760
 
 INSTALLED_APPS = [
     'django.contrib.admin',

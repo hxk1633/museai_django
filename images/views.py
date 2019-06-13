@@ -1,12 +1,13 @@
 from django.shortcuts import render
 from django.views.generic import ListView
-from .models import Video, Album
+from images.models import *
 from rest_framework import viewsets
 from rest_framework.parsers import FileUploadParser, MultiPartParser, JSONParser, FormParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
-from .serializers import VideoSerializer, AlbumSerializer, FileSerializer
+from images.serializers import VideoSerializer, AlbumSerializer, FileSerializer
+
 
 
 # Create your views here.
@@ -40,10 +41,6 @@ class FileUploadView(APIView):
         if file_serializer.is_valid():
             file_serializer.save()
             video = Video.create(file_serializer.data['title'], file_serializer.data['file'], file_serializer.data['pin'])
-            print(file_serializer.data['file'])
-            print(video.getFileName())
-            print(video.getAlbumName())
-            #print(video.getFilePath())
             video.save()
             return Response(file_serializer.data, status=status.HTTP_201_CREATED)
         else:

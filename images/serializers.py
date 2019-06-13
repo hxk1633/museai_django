@@ -1,4 +1,4 @@
-from .models import Video, Album, VideoFile, TFModel
+from images.models import Video, Album, VideoFile, TFModel
 from rest_framework import serializers
 
 
@@ -22,7 +22,4 @@ class FileSerializer(serializers.ModelSerializer):
 class TFModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = TFModel
-        fields = ('name', 'album', 'objects')
-
-    def get_objects(self, instance):
-        return Video.objects.filter(album=self.album).count()
+        fields = ('name', 'album', 'videos')
