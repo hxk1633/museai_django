@@ -38,10 +38,12 @@ class FileUploadView(APIView):
         }
         """
         file_serializer = FileSerializer(data=request.data)
-        if file_serializer.is_valid():
+        if file_serializer.is_valid() and file_serializer.check_pin(file_serializer.data['pin']):
             file_serializer.save()
             video = Video.create(file_serializer.data['title'], file_serializer.data['file'], file_serializer.data['pin'])
             video.save()
             return Response(file_serializer.data, status=status.HTTP_201_CREATED)
+        elif file_serializer.is_valid() and file_serializer.check_pin(file_serializer.data['pin']) == False:
+            return Response({'pin': file_serializer.data['title'] + ' album is closed.'}, status=status.HTTP_403_FORBIDDEN)
         else:
             return Response(file_serializer.errors, status=status.HTTP_400_BAD_REQUEST)

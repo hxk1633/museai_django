@@ -5,9 +5,9 @@ import os
 import sys
 import zipfile
 
-STATUS_CHOICES = [
-    ('t','todo'),
-    ('p', 'Processing'),
+MODEL_STATUS = [
+    ('s','todo'),
+    ('t', 'Training'),
     ('c', 'Created'),
 ]
 
@@ -52,9 +52,8 @@ def zip_folder(folder_path, output_path):
 
 def convertVideo(video):
     os.mkdir('media/albums/' + video.getAlbumName() + "/data/images/" + video.getFileName())
-    #convert = FFmpeg(inputs={video.getFilePath(): None}, outputs={"media/videos/" + video.getFileName() + ".mp4": None})
     convert = FFmpeg(inputs={"media/videos/" + video.getFileName() + ".MOV": None}, outputs={"media/videos/" + video.getFileName() + ".mp4": None})
-    ff = FFmpeg(inputs={"media/videos/" + video.getFileName() + ".mp4": None}, outputs={"media/albums/" + video.getAlbumName() + "/data/images/" + video.getFileName() + "/" + video.getFileName() + "%d.png": ['-vf', 'fps=5']})
+    ff = FFmpeg(inputs={"media/videos/" + video.getFileName() + ".mp4": None}, outputs={"media/albums/" + video.getAlbumName() + "/data/images/" + video.getFileName() + "/" + video.getFileName() + "%d.jpg": ['-vf', 'fps=5']})
     convert.run()
     ff.run()
     #zip_folder("media/albums/"+video.getFileName(), "media/albums/" +video.getAlbumName()+"/data/images"+video.getFileName()+".zip")
@@ -65,6 +64,7 @@ class Album(models.Model):
     description = models.CharField(max_length=255)
     pin = models.CharField(max_length=50)
     status = models.CharField(max_length=1, choices=ALBUM_STATUS, default='o')
+    model_status = models.CharField(max_length=1, choices=MODEL_STATUS, default='s')
     id = models.AutoField(primary_key=True, auto_created=True)
 
     def save(self, *args, **kwargs):
@@ -72,11 +72,7 @@ class Album(models.Model):
         os.mkdir("media/albums/" + self.name + "/data/")
         os.mkdir("media/albums/" + self.name + "/data/images/")
         super(Album, self).save(*args, **kwargs)
-    """
-    @property
-    def videos(self):
-        return self.video_set.count()
-    """
+
     def __str__(self):
         return self.name
 
