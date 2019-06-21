@@ -6,9 +6,8 @@ from rest_framework.parsers import FileUploadParser, MultiPartParser, JSONParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
-from images.serializers import VideoSerializer, AlbumSerializer, FileSerializer
-
-
+from images.serializers import VideoSerializer, AlbumSerializer
+import json
 
 # Create your views here.
 class HomePageView(ListView):
@@ -30,20 +29,30 @@ class AlbumViewSet(viewsets.ModelViewSet):
     serializer_class = AlbumSerializer
 
 class FileUploadView(APIView):
-    parser_classes = (MultiPartParser, FormParser)
-    def post(self, request, *args, **kwargs):
-        """
-        serializer_context = {
-            'request': request,
-        }
-        """
-        file_serializer = FileSerializer(data=request.data)
-        if file_serializer.is_valid() and file_serializer.check_pin(file_serializer.data['pin']):
-            file_serializer.save()
-            video = Video.create(file_serializer.data['title'], file_serializer.data['file'], file_serializer.data['pin'])
-            video.save()
-            return Response(file_serializer.data, status=status.HTTP_201_CREATED)
-        elif file_serializer.is_valid() and file_serializer.check_pin(file_serializer.data['pin']) == False:
-            return Response({'pin': file_serializer.data['title'] + ' album is closed.'}, status=status.HTTP_403_FORBIDDEN)
+    #parser_classes = (MultiPartParser, FormParser)
+
+
+    def check_pin(user_pin, y):
+        s = Album.objects.get(pin=y).status
+        if s == 'o':
+            return True
         else:
-            return Response(file_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return False
+
+    def post(self, request, *args, **kwargs):
+        #file_serializer = FileSerializer(data=request.data)
+        #if file_serializer.is_valid():
+            #file_serializer.save()
+        #print(request.body)
+        data = base64.decode(request.body)
+        print(data)
+        video_data = json.loads(data)
+        #print(video_data)
+        if self.check_pin(video_data["pin"]):
+            video = Video.create(video_data["title"], video_data["file"], video_data['pin'])
+            video.save()
+            return Response(video_data, status=status.HTTP_201_CREATED)
+        elif file_serializer.check_pin(file_serializer.data['pin']) == False:
+            return Response({'pin': Album.objects.get(pin=video_data['pin']).name + ' album is closed.'}, status=status.HTTP_403_FORBIDDEN)
+        else:
+            return Response(video_data, status=status.HTTP_400_BAD_REQUEST)

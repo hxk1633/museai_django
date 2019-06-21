@@ -1,5 +1,6 @@
-from images.models import Video, Album, VideoFile, TFModel
+from images.models import Video, Album, TFModel
 from rest_framework import serializers
+import base64
 
 
 class VideoSerializer(serializers.HyperlinkedModelSerializer):
@@ -8,11 +9,11 @@ class VideoSerializer(serializers.HyperlinkedModelSerializer):
         fields = ('url', 'title', 'album', 'file')
 
 
-class AlbumSerializer(serializers.HyperlinkedModelSerializer):
+class AlbumSerializer(serializers.ModelSerializer):
     class Meta:
         model = Album
         fields = ('url', 'name', 'description', 'pin', 'status')
-
+"""
 class FileSerializer(serializers.ModelSerializer):
     def check_pin(pin, y):
         s = Album.objects.get(pin=y).status
@@ -24,8 +25,9 @@ class FileSerializer(serializers.ModelSerializer):
     class Meta:
         model = VideoFile
         fields = ('title', 'file', 'pin')
-
+"""
 class TFModelSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = TFModel
         fields = ('name', 'album', 'videos')

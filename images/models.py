@@ -1,9 +1,17 @@
 from django.db import models
+from io import BytesIO
 from django.db.models import F
 from ffmpy import FFmpeg
+from django.utils.crypto import get_random_string
 import os
 import sys
+import base64
+import uuid
 import zipfile
+from celery import Celery
+import json
+import images.make_json_serializable   # apply monkey-patch
+from images.tasks import new_pin
 
 MODEL_STATUS = [
     ('s','todo'),
@@ -51,27 +59,39 @@ def zip_folder(folder_path, output_path):
         zip_file.close()
 
 def convertVideo(video):
-    os.mkdir('media/albums/' + video.getAlbumName() + "/data/images/" + video.getFileName())
+    #print(video.getFileName())
+    os.mkdir("media/albums/" + video.getAlbumName() + "/data/images/" + video.getFileName())
     convert = FFmpeg(inputs={"media/videos/" + video.getFileName() + ".MOV": None}, outputs={"media/videos/" + video.getFileName() + ".mp4": None})
-    ff = FFmpeg(inputs={"media/videos/" + video.getFileName() + ".mp4": None}, outputs={"media/albums/" + video.getAlbumName() + "/data/images/" + video.getFileName() + "/" + video.getFileName() + "%d.jpg": ['-vf', 'fps=5']})
+    ff = FFmpeg(inputs={"media/videos/" + video.getFileName() + ".mp4": None}, outputs={"media/albums/" + video.getAlbumName() + "/data/images/" + video.getFileName() + "/" + video.getFileName() + "%d.jpg": ['-vf', 'fps=30']})
     convert.run()
     ff.run()
-    #zip_folder("media/albums/"+video.getFileName(), "media/albums/" +video.getAlbumName()+"/data/images"+video.getFileName()+".zip")
+    zip_folder("media/albums/"+video.getAlbumName()+"/data/images/"+ video.getFileName(), "media/albums/" +video.getAlbumName()+"/data/images/"+video.getFileName()+".zip")
 
 # Create your models here.
 class Album(models.Model):
     name = models.CharField(max_length=50)
     description = models.CharField(max_length=255)
-    pin = models.CharField(max_length=50)
+    pin = models.CharField(editable=False, max_length=6)
     status = models.CharField(max_length=1, choices=ALBUM_STATUS, default='o')
     model_status = models.CharField(max_length=1, choices=MODEL_STATUS, default='s')
     id = models.AutoField(primary_key=True, auto_created=True)
 
     def save(self, *args, **kwargs):
+        self.pin = get_random_string(length=6).upper()
         os.mkdir("media/albums/" + self.name)
         os.mkdir("media/albums/" + self.name + "/data/")
         os.mkdir("media/albums/" + self.name + "/data/images/")
+        create_task = False # variable to know if celery task is to be created
+        if self.pk is None: # Check if instance has 'pk' attribute set
+            # Celery Task is to created in case of 'INSERT'
+            create_task = True # set the variable
         super(Album, self).save(*args, **kwargs)
+        if create_task:
+            new_pin.apply_async(args=[self], countdown=10)
+
+    def to_json(self):  # New special method.
+        """ Convert to JSON format string representation. """
+        return '{"name": "%s", "description": "%s", "pin": "%s", "status": "%s", "model_status": "%s"}' % (self.name, self.description, self.pin, self.status, self.model_status)
 
     def __str__(self):
         return self.name
@@ -118,11 +138,13 @@ class Video(models.Model):
     def __str__(self):
         return self.title
 
-
+if __name__ == '__main__':
+        celery.start()
+"""
 class VideoFile(models.Model):
     title = models.CharField(max_length=50, default="")
     file = models.FileField(upload_to='videos/')
     pin = models.CharField(max_length=50, default="")
-
     def __str__(self):
         return self.file.name
+"""
