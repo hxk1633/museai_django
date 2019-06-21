@@ -2,6 +2,7 @@ from django.contrib import admin
 import os
 import time
 from images.models import Video, Album, TFModel
+from images.tasks import new_pin
 from subprocess import Popen, PIPE
 # Register your models here.
 
@@ -10,6 +11,10 @@ def close_album(modeladmin, request, queryset):
 
 def open_album(modeladmin, request, queryset):
     queryset.update(status='o')
+
+def generate_pin(modeladmin, request, queryset):
+    for album in queryset:
+        new_pin.apply_async(args=[album.pin], countdown=10)
 
 def create_model(modeladmin, request, queryset):
     for album in queryset:
@@ -30,11 +35,12 @@ def create_model(modeladmin, request, queryset):
 close_album.short_description = "Close album to users"
 open_album.short_description = "Make album available to users"
 create_model.short_description = "Create model"
+generate_pin.short_description = "Generate new pin"
 
 class AlbumAdmin(admin.ModelAdmin):
     list_display = ['name', 'description', 'pin', 'model_status', 'status']
     ordering = ['name']
-    actions = [close_album, open_album, create_model]
+    actions = [close_album, open_album, create_model, generate_pin]
 
 class VideoAdmin(admin.ModelAdmin):
     list_display = ['title', 'album']

@@ -11,7 +11,6 @@ import zipfile
 from celery import Celery
 import json
 import images.make_json_serializable   # apply monkey-patch
-from images.tasks import new_pin
 
 MODEL_STATUS = [
     ('s','todo'),
@@ -78,16 +77,13 @@ class Album(models.Model):
 
     def save(self, *args, **kwargs):
         self.pin = get_random_string(length=6).upper()
-        os.mkdir("media/albums/" + self.name)
-        os.mkdir("media/albums/" + self.name + "/data/")
-        os.mkdir("media/albums/" + self.name + "/data/images/")
-        create_task = False # variable to know if celery task is to be created
-        if self.pk is None: # Check if instance has 'pk' attribute set
-            # Celery Task is to created in case of 'INSERT'
-            create_task = True # set the variable
+        try:
+            os.mkdir("media/albums/" + self.name)
+            os.mkdir("media/albums/" + self.name + "/data/")
+            os.mkdir("media/albums/" + self.name + "/data/images/")
+        except:
+            pass
         super(Album, self).save(*args, **kwargs)
-        if create_task:
-            new_pin.apply_async(args=[self], countdown=10)
 
     def to_json(self):  # New special method.
         """ Convert to JSON format string representation. """

@@ -44,9 +44,10 @@ class FileUploadView(APIView):
         #if file_serializer.is_valid():
             #file_serializer.save()
         #print(request.body)
-        data = base64.decode(request.body)
-        print(data)
-        video_data = json.loads(data)
+        print(request.body)
+        #data = base64.decode(request.body)
+        #print(data)
+        video_data = json.loads(request.body)
         #print(video_data)
         if self.check_pin(video_data["pin"]):
             video = Video.create(video_data["title"], video_data["file"], video_data['pin'])
