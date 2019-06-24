@@ -9,28 +9,29 @@ from rest_framework import status
 from images.serializers import VideoSerializer, AlbumSerializer
 import json
 
-# Create your views here.
 class HomePageView(ListView):
     model = Video
     template_name = 'home.html'
 
 class VideoViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows videos to be viewed or edited.
-    """
     queryset = Video.objects.all()
     serializer_class = VideoSerializer
+    class Meta:
+        ordering = ['-id']
+    def post(self, request):
+        serializer = VideoSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(status=status.HTTP_201_CREATED)
 
 class AlbumViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows albums to be viewed or edited.
-    """
+
     queryset = Album.objects.all()
     serializer_class = AlbumSerializer
 
+"""
 class FileUploadView(APIView):
     #parser_classes = (MultiPartParser, FormParser)
-
 
     def check_pin(user_pin, y):
         s = Album.objects.get(pin=y).status
@@ -57,3 +58,4 @@ class FileUploadView(APIView):
             return Response({'pin': Album.objects.get(pin=video_data['pin']).name + ' album is closed.'}, status=status.HTTP_403_FORBIDDEN)
         else:
             return Response(video_data, status=status.HTTP_400_BAD_REQUEST)
+"""

@@ -60,9 +60,9 @@ def zip_folder(folder_path, output_path):
 def convertVideo(video):
     #print(video.getFileName())
     os.mkdir("media/albums/" + video.getAlbumName() + "/data/images/" + video.getFileName())
-    convert = FFmpeg(inputs={"media/videos/" + video.getFileName() + ".MOV": None}, outputs={"media/videos/" + video.getFileName() + ".mp4": None})
+    #convert = FFmpeg(inputs={"media/videos/" + video.getFileName() + ".MOV": None}, outputs={"media/videos/" + video.getFileName() + ".mp4": None})
     ff = FFmpeg(inputs={"media/videos/" + video.getFileName() + ".mp4": None}, outputs={"media/albums/" + video.getAlbumName() + "/data/images/" + video.getFileName() + "/" + video.getFileName() + "%d.jpg": ['-vf', 'fps=30']})
-    convert.run()
+    #convert.run()
     ff.run()
     zip_folder("media/albums/"+video.getAlbumName()+"/data/images/"+ video.getFileName(), "media/albums/" +video.getAlbumName()+"/data/images/"+video.getFileName()+".zip")
 
@@ -104,7 +104,8 @@ class TFModel(models.Model):
 class Video(models.Model):
     title = models.CharField(max_length=50, primary_key=True)
     file = models.FileField(upload_to='videos/')
-    album = models.ForeignKey(Album, on_delete=models.CASCADE, default="")
+    album = models.ForeignKey(Album, on_delete=models.CASCADE, default="", null=True)
+    pin = models.CharField(max_length=6, null=True)
 
     def getFilePath(self):
         return self.file.path
@@ -117,7 +118,9 @@ class Video(models.Model):
         return "media/albums/" + name + ".zip"
 
     def getAlbumName(self):
-        return self.album.name
+        album = Album.objects.get(pin=self.pin)
+        return album.name
+
 
     def save(self, *args, **kwargs):
         print("Converting video")
@@ -136,11 +139,3 @@ class Video(models.Model):
 
 if __name__ == '__main__':
         celery.start()
-"""
-class VideoFile(models.Model):
-    title = models.CharField(max_length=50, default="")
-    file = models.FileField(upload_to='videos/')
-    pin = models.CharField(max_length=50, default="")
-    def __str__(self):
-        return self.file.name
-"""

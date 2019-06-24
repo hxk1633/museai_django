@@ -3,10 +3,14 @@ from rest_framework import serializers
 import base64
 
 
-class VideoSerializer(serializers.HyperlinkedModelSerializer):
+class VideoSerializer(serializers.ModelSerializer):
+    title = serializers.CharField(max_length=50)
+    pin = serializers.CharField(max_length=6)
+    file = serializers.FileField(max_length=None, use_url=True)
+
     class Meta:
         model = Video
-        fields = ('url', 'title', 'album', 'file')
+        fields = ('title', 'pin', 'file')
 
 
 class AlbumSerializer(serializers.ModelSerializer):
