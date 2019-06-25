@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
 import os
+from celery.schedules import crontab
+
 
 
 CELERY_BROKER_URL = 'amqp://guest:guest@localhost//'
@@ -20,6 +22,9 @@ CELERY_BROKER_URL = 'amqp://guest:guest@localhost//'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_RESULT_BACKEND = 'db+sqlite:///results.sqlite'
 CELERY_TASK_SERIALIZER = 'json'
+# Other Celery settings
+CELERY_BEAT_SCHEDULE = {}
+
 
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -58,6 +63,7 @@ INSTALLED_APPS = [
     'images.apps.ImagesConfig',
     'django_celery_results',
     'rest_framework',
+    'django_celery_beat',
 ]
 
 MIDDLEWARE = [
