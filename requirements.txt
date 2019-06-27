@@ -6,8 +6,8 @@ Django==2.2.2
 django-celery-results==1.1.2
 djangorestframework==3.9.4
 django_celery_beat
-ffmpeg==1.4
-ffmpy==0.2.2
+ffmpeg
+ffmpy
 Flask==1.0.3
 Flask-SQLAlchemy==2.4.0
 itsdangerous==1.1.0
