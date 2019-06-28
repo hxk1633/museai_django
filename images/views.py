@@ -16,13 +16,18 @@ class HomePageView(ListView):
 class VideoViewSet(viewsets.ModelViewSet):
     queryset = Video.objects.all()
     serializer_class = VideoSerializer
+
     class Meta:
         ordering = ['-id']
+
     def post(self, request):
         serializer = VideoSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(status=status.HTTP_201_CREATED)
+        if serializer.is_valid():
+            serializer.save()
+            return Response("Your video has been uploaded!", status=status.HTTP_201_CREATED)
+        else:
+            print(serializer.errors)
+            return Response(serializer.errors)
 
 class AlbumViewSet(viewsets.ModelViewSet):
 

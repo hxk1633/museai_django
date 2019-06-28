@@ -3,7 +3,6 @@ import os
 import time
 from images.models import Video, Album, TFModel
 from images.tasks import new_model
-from subprocess import Popen, PIPE
 # Register your models here.
 
 def close_album(modeladmin, request, queryset):
@@ -14,12 +13,11 @@ def open_album(modeladmin, request, queryset):
 
 def create_model(modeladmin, request, queryset):
     for album in queryset:
-        new_model.apply_async(args=[album], countdown=5)
+        new_model.apply_async(args=[album.id], countdown=5)
 
 close_album.short_description = "Close album to users"
 open_album.short_description = "Make album available to users"
 create_model.short_description = "Create model"
-
 
 class AlbumAdmin(admin.ModelAdmin):
     list_display = ['name', 'description', 'pin', 'model_status', 'status']
