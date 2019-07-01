@@ -11,6 +11,7 @@ import zipfile
 from celery import Celery
 import json
 import images.make_json_serializable   # apply monkey-patch
+from functools import partial
 
 MODEL_STATUS = [
     ('s','todo'),
@@ -22,6 +23,7 @@ ALBUM_STATUS = [
     ('o', 'Open'),
     ('c', 'Closed'),
 ]
+
 
 def zip_folder(folder_path, output_path):
     """Zip the contents of an entire folder (with that folder included
@@ -66,6 +68,10 @@ def convertVideo(video):
     ff.run()
     zip_folder("media/albums/"+video.getAlbumName()+"/data/images/"+ video.getFileName(), "media/albums/" +video.getAlbumName()+"/data/images/"+video.getFileName()+".zip")
 
+def update_filename(instance, filename):
+    name = instance.title + ".mp4"
+    return os.path.join("videos/", name)
+
 # Create your models here.
 class Album(models.Model):
     name = models.CharField(max_length=50)
@@ -103,7 +109,7 @@ class TFModel(models.Model):
 
 class Video(models.Model):
     title = models.CharField(max_length=50, primary_key=True)
-    file = models.FileField(upload_to='videos/')
+    file = models.FileField(upload_to=update_filename)
     album = models.ForeignKey(Album, on_delete=models.CASCADE, default="", null=True)
     pin = models.CharField(max_length=6, null=True)
 
@@ -120,7 +126,6 @@ class Video(models.Model):
     def getAlbumName(self):
         album = Album.objects.get(pin=self.pin)
         return album.name
-
 
     def save(self, *args, **kwargs):
         print("Converting video")
