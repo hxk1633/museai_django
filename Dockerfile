@@ -1,5 +1,4 @@
-
-FROM tensorflow/tensorflow:latest-gpu-py3
+FROM tensorflow/tensorflow:latest-py3
 
 LABEL maintainer="Shuhei Iitsuka <tushuhei@google.com>"
 
@@ -11,6 +10,8 @@ RUN apt-get update && \
     apt-get clean
 
 RUN pip3 install -U pip
+
+RUN pip3 --no-cache-dir install tensorflowjs==0.8.6
 
 WORKDIR /
 
@@ -31,8 +32,6 @@ CMD python3 /tensorflow/tensorflow/examples/image_retraining/retrain.py \
     echo 'export const SCAVENGER_CLASSES: {[key: number]: string} = {' > /data/scavenger_classes.ts && \
     awk '{print NR-1  ": '\''" $0 "'\'',"}' /data/output_labels.txt >> /data/scavenger_classes.ts && \
     echo '}' >> /data/scavenger_classes.ts && \
-    # Installing tensorflowjs package after training since it may overwrite the GPU version of TensorFlow.
-    pip3 --no-cache-dir install tensorflowjs==0.8.6 && \
     python3 -m tensorflowjs.converters.converter \
         --input_format=tf_saved_model \
         --output_node_names='final_result' \

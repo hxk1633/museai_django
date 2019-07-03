@@ -3,6 +3,7 @@ from celery import shared_task
 from django.utils.crypto import get_random_string
 from images.models import Album, TFModel
 import time
+import os
 from subprocess import Popen, PIPE
 
 @shared_task
@@ -15,18 +16,30 @@ def new_pins():
 @shared_task
 def new_model(album_id):
     album = Album.objects.get(id=album_id)
-    gpu_machine = ["", "", ""]
-    system_clean = ["docker", "system", "prune"]
-    build_cmd = ["nvidia-docker", "build", ".", "-t", "model-builder"]
-    run_cmd = ["nvidia-docker", "run", "-v", "/home/cat/Desktop/museai_django/media/albums/" + album.name + "/data:/data", "-it", "model-builder"]
+    #gpu_machine = ["", "", ""]
+    system_clean = ["docker", "system", "prune", "-a"]
+    build_cmd = ["docker", "build", "-t", "model-builder", "."]
+    run_cmd = ["docker", "run", "-v", "/home/harrison/Desktop/museai_django/media/albums/" + album.name + "/data:/data", "-it", "model-builder"]
     Album.objects.filter(name=album.name).update(model_status='t')
     build = Popen(build_cmd, stdout=PIPE)
     run = Popen(run_cmd, stdout=PIPE)
-    while build.poll() is None:
-        time.sleep(0.5)
-    print("build done")
-    while run.poll() is None:
-        time.sleep(0.5)
     print("model created")
+    print(build.communicate())
+    print(run.communicate())
     Album.objects.filter(name=album.name).update(model_status='c')
-    tfmodel = TFModel.objects.create(name=album.name, album=album, accuracy=100)
+    tfmodel = TFModel.objects.create(name=album.name, album_model=album)
+
+@shared_task
+def visualize_data():
+    os.system("killall -v tensorboard")
+    models = Album.objects.filter(model_status='c')
+    cmd = "tensorboard --logdir="
+    count = 0
+    for model in models:
+        if count > 0:
+            cmd += ","
+        name = model.name.replace(" ", "_")
+        cmd += name.lower() + ":/home/harrison/Desktop/museai_django/media/albums/" + name + "/data/summaries"
+        count += 1
+    print(cmd)
+    run_tensorboard = Popen(cmd.split(" "), stdout=PIPE)

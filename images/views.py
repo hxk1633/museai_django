@@ -23,6 +23,7 @@ class VideoViewSet(viewsets.ModelViewSet):
     def post(self, request):
         serializer = VideoSerializer(data=request.data)
         if serializer.is_valid():
+            serializer.create(serializer.title, serializer.file, serializer.pin)
             serializer.save()
             return Response("Your video has been uploaded!", status=status.HTTP_201_CREATED)
         else:

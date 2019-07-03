@@ -92,7 +92,6 @@ class Album(models.Model):
         super(Album, self).save(*args, **kwargs)
 
     def to_json(self):  # New special method.
-        """ Convert to JSON format string representation. """
         return '{"name": "%s", "description": "%s", "pin": "%s", "status": "%s", "model_status": "%s"}' % (self.name, self.description, self.pin, self.status, self.model_status)
 
     def __str__(self):
@@ -101,8 +100,7 @@ class Album(models.Model):
 class TFModel(models.Model):
     name = models.CharField(max_length=50)
     videos = models.IntegerField(max_length=5, editable=False, default=0)
-    accuracy = models.CharField(max_length=4, editable=False, default="100%")
-    album = models.ForeignKey(Album, on_delete=models.CASCADE,default="")
+    album_model = models.ForeignKey(Album, on_delete=models.CASCADE, default="", null=True)
 
     def __str__(self):
         return self.name
@@ -110,8 +108,8 @@ class TFModel(models.Model):
 class Video(models.Model):
     title = models.CharField(max_length=50, primary_key=True)
     file = models.FileField(upload_to=update_filename)
-    album = models.ForeignKey(Album, on_delete=models.CASCADE, default="", null=True)
-    pin = models.CharField(max_length=6, null=True)
+    album_vdo = models.ForeignKey(Album, on_delete=models.CASCADE, default="", null=True)
+    pin = models.CharField(max_length=6)
 
     def getFilePath(self):
         return self.file.path
@@ -136,11 +134,8 @@ class Video(models.Model):
     @classmethod
     def create(cls, title, file, pin):
         album = Album.objects.get(pin=pin)
-        video = cls(title=title, file=file, album=album)
+        video = cls(title=title, file=file, album_vdo=album)
         return video
 
     def __str__(self):
         return self.title
-
-if __name__ == '__main__':
-        celery.start()

@@ -25,11 +25,11 @@ class AlbumAdmin(admin.ModelAdmin):
     actions = [close_album, open_album, create_model]
 
 class VideoAdmin(admin.ModelAdmin):
-    list_display = ['title', 'album']
+    list_display = ['title', 'album_vdo']
     ordering = ['title']
 
 class TFModelAdmin(admin.ModelAdmin):
-    list_display = ['name', 'album', 'accuracy']
+    list_display = ['name', 'album_model']
     ordering = ['name']
 
 admin.site.register(Album, AlbumAdmin)
