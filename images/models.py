@@ -82,7 +82,7 @@ class Album(models.Model):
     id = models.AutoField(primary_key=True, auto_created=True)
 
     def save(self, *args, **kwargs):
-        self.pin = get_random_string(length=6).upper()
+        #self.pin = get_random_string(length=6).upper()
         try:
             os.mkdir("media/albums/" + self.name)
             os.mkdir("media/albums/" + self.name + "/data/")
@@ -127,6 +127,9 @@ class Video(models.Model):
 
     def save(self, *args, **kwargs):
         print("Converting video")
+        album = Album.objects.get(pin=self.pin)
+        album.model_status = 's'
+        album.save()
         super(Video, self).save(*args, **kwargs)
         convertVideo(self)
         print("Conversion successful")

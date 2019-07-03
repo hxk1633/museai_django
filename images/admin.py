@@ -17,7 +17,7 @@ def create_model(modeladmin, request, queryset):
 
 close_album.short_description = "Close album to users"
 open_album.short_description = "Make album available to users"
-create_model.short_description = "Create model"
+create_model.short_description = "Train model"
 
 class AlbumAdmin(admin.ModelAdmin):
     list_display = ['name', 'description', 'pin', 'model_status', 'status']
