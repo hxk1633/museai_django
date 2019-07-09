@@ -12,6 +12,9 @@ from celery import Celery
 import json
 import images.make_json_serializable   # apply monkey-patch
 from functools import partial
+from django.db import models
+from django.db.models.signals import post_delete, pre_save
+from django.core.files.storage import default_storage
 
 MODEL_STATUS = [
     ('s','todo'),
@@ -23,6 +26,28 @@ ALBUM_STATUS = [
     ('o', 'Open'),
     ('c', 'Closed'),
 ]
+
+def new_pin(sender, instance, **kwargs):
+    instance.pin = get_random_string(length=6).upper()
+
+def file_cleanup(sender, instance, **kwargs):
+    """
+    File cleanup callback used to emulate the old delete
+    behavior using signals. Initially django deleted linked
+    files when an object containing a File/ImageField was deleted.
+
+    Usage:
+    >>> from django.db.models.signals import post_delete
+    >>> post_delete.connect(file_cleanup, sender=MyModel, dispatch_uid="mymodel.file_cleanup")
+    """
+    if isinstance(instance, Video):
+        path = instance.getFilePath()
+        os.remove(path)
+    elif isinstance(instance, Album):
+        os.rmdir("media/albums/" + instance.name + "/data/images/")
+        os.rmdir("media/albums/" + instance.name + "/data/")
+        os.rmdir("media/albums/" + instance.name + "/")
+
 
 
 def zip_folder(folder_path, output_path):
@@ -142,3 +167,7 @@ class Video(models.Model):
 
     def __str__(self):
         return self.title
+
+post_delete.connect(file_cleanup, sender=Video, dispatch_uid="video.file_cleanup")
+post_delete.connect(file_cleanup, sender=Album, dispatch_uid="album.file_cleanup")
+pre_save.connect(new_pin, sender=Album, dispatch_uid="album.new_pin")

@@ -7,6 +7,7 @@ from .views import HomePageView
 
 router = routers.DefaultRouter()
 router.register(r'videos', VideoViewSet)
+router.register(r'albums', AlbumViewSet)
 
 api_urlpatterns = ([
     url('', include(router.urls)),
