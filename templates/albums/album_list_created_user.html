@@ -1,0 +1,19 @@
+{% extends "home.html" %}
+
+{% block content %}
+    <h1>My Albums</h1>
+
+    {% if album_list %}
+    <ul>
+
+      {% for album in album_list %}
+      <li>
+        Name: {{album.name}}, PIN: {{ album.pin }}
+      </li>
+      {% endfor %}
+    </ul>
+
+    {% else %}
+      <p>You did not create any albums.</p>
+    {% endif %}
+{% endblock %}
