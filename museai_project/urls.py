@@ -17,12 +17,15 @@ from django.contrib import admin
 from django.conf import settings
 from django.urls import path, include
 from django.conf.urls.static import static
+from images import views
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('upload/', include('images.urls')),
     path('', include('images.urls')),
+    path('accounts/', include('django.contrib.auth.urls')),
+    path('myalbums/', views.AlbumsByUserListView.as_view(), name='my-albums')
 ]
 
 if settings.DEBUG:

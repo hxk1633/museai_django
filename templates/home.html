@@ -1,7 +1,16 @@
-<h1>Museai Video Uploading</h1>
-<ul>
-  {% for video in object_list %}
-    <h2>{{ post.title }}</h2>
-    <img src="{{ video.cover.url}}" alt="{{ video.title }}">
-  {% endfor %}
+<h1>Museai Web App</h1>
+{% block sidebar %}
+<ul class="sidebar-nav">
+
+ {% if user.is_authenticated %}
+   <li>User: {{ user.get_username }}</li>
+   <li><a href="{% url 'my-albums' %}">My Albums</a></li>
+   <li><a href="{% url 'logout'%}?next={{request.path}}">Logout</a></li>
+ {% else %}
+   <li><a href="{% url 'login'%}?next={{request.path}}">Login</a></li>
+ {% endif %}
 </ul>
+{% endblock %}
+{% block content %}
+
+{% endblock %}

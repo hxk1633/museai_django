@@ -20,7 +20,7 @@ open_album.short_description = "Make album available to users"
 create_model.short_description = "Train model"
 
 class AlbumAdmin(admin.ModelAdmin):
-    list_display = ['name', 'description', 'pin', 'model_status', 'status']
+    list_display = ['organization', 'name', 'description', 'pin', 'model_status', 'status']
     ordering = ['name']
     actions = [close_album, open_album, create_model]
 

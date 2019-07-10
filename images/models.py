@@ -15,6 +15,8 @@ from functools import partial
 from django.db import models
 from django.db.models.signals import post_delete, pre_save
 from django.core.files.storage import default_storage
+from django.contrib.auth.models import User
+
 
 MODEL_STATUS = [
     ('s','todo'),
@@ -105,6 +107,8 @@ class Album(models.Model):
     status = models.CharField(max_length=1, choices=ALBUM_STATUS, default='o')
     model_status = models.CharField(max_length=1, choices=MODEL_STATUS, default='s')
     id = models.AutoField(primary_key=True, auto_created=True)
+    organization = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+
 
     def save(self, *args, **kwargs):
         #self.pin = get_random_string(length=6).upper()
@@ -170,4 +174,4 @@ class Video(models.Model):
 
 post_delete.connect(file_cleanup, sender=Video, dispatch_uid="video.file_cleanup")
 post_delete.connect(file_cleanup, sender=Album, dispatch_uid="album.file_cleanup")
-pre_save.connect(new_pin, sender=Album, dispatch_uid="album.new_pin")
+#pre_save.connect(new_pin, sender=Album, dispatch_uid="album.new_pin")
