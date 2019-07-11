@@ -7,18 +7,28 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
 from images.serializers import VideoSerializer, AlbumSerializer
+from django.views.generic.edit import CreateView, DeleteView
 import json
 from django.views import generic
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.urls import reverse_lazy
 
 class AlbumsByUserListView(LoginRequiredMixin,generic.ListView):
     """Generic class-based view listing albums to current user."""
     model = Album
-    template_name ='albums/album_list_created_user.html'
+    template_name ='images/album_list_created_user.html'
     paginate_by = 10
 
     def get_queryset(self):
         return Album.objects.filter(organization=self.request.user).order_by('name')
+
+class AlbumCreate(CreateView):
+    model = Album
+    fields = '__all__'
+
+class AlbumDelete(DeleteView):
+    model = Album
+    success_url = reverse_lazy('myalbums')
 
 class HomePageView(ListView):
     model = Video

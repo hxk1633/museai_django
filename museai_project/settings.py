@@ -149,4 +149,6 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Redirect to home URL after login (Default redirects to /accounts/profile/)
-LOGIN_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = '/myalbums'
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
