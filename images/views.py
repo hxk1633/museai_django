@@ -9,9 +9,15 @@ from rest_framework import status
 from images.serializers import VideoSerializer, AlbumSerializer
 from django.views.generic.edit import CreateView, DeleteView
 import json
-from django.views import generic
+from django.views import generic, View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
+from django.shortcuts import redirect
+from .forms import VideoForm
+from django.http import JsonResponse
+
+
+
 
 class AlbumsByUserListView(LoginRequiredMixin,generic.ListView):
     """Generic class-based view listing albums to current user."""
@@ -22,17 +28,37 @@ class AlbumsByUserListView(LoginRequiredMixin,generic.ListView):
     def get_queryset(self):
         return Album.objects.filter(organization=self.request.user).order_by('name')
 
-class AlbumCreate(CreateView):
+class AlbumCreate(LoginRequiredMixin, CreateView):
     model = Album
-    fields = '__all__'
+    fields = ['name','description']
+    def form_valid(self, form):
+        album = form.save(commit=False)
+        album.organization =  self.request.user
+        album.save()
+        form.save_m2m()
+        return redirect('/myalbums')
 
-class AlbumDelete(DeleteView):
+class AlbumDelete(LoginRequiredMixin, DeleteView):
     model = Album
     success_url = reverse_lazy('myalbums')
 
 class HomePageView(ListView):
     model = Video
     template_name = 'home.html'
+
+class BasicUploadView(LoginRequiredMixin, View):
+    def get(self, request):
+        video_list = Video.objects.all()
+        return render(self.request, 'basic_upload/index.html', {'videos': video_list})
+
+    def post(self, request):
+        form = VideoForm(self.request.POST, self.request.FILES)
+        if form.is_valid():
+            video = form.save()
+            data = {'is_valid': True, 'name': video.file.name, 'url': video.file.url}
+        else:
+            data = {'is_valid': False}
+        return JsonResponse(data)
 
 class VideoViewSet(viewsets.ModelViewSet):
     queryset = Video.objects.all()
@@ -52,6 +78,5 @@ class VideoViewSet(viewsets.ModelViewSet):
             return Response(serializer.errors)
 
 class AlbumViewSet(viewsets.ModelViewSet):
-
     queryset = Album.objects.all()
     serializer_class = AlbumSerializer

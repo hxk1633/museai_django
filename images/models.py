@@ -174,4 +174,4 @@ class Video(models.Model):
 
 post_delete.connect(file_cleanup, sender=Video, dispatch_uid="video.file_cleanup")
 post_delete.connect(file_cleanup, sender=Album, dispatch_uid="album.file_cleanup")
-#pre_save.connect(new_pin, sender=Album, dispatch_uid="album.new_pin")
+pre_save.connect(new_pin, sender=Album, dispatch_uid="album.new_pin")

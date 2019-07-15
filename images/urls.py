@@ -2,6 +2,7 @@ from django.urls import include, path
 from rest_framework import routers
 from django.conf.urls import url
 from .views import *
+from . import views
 
 from .views import HomePageView
 
@@ -15,4 +16,5 @@ api_urlpatterns = ([
 
 urlpatterns = [
     url(r'^api/', include(api_urlpatterns)),
+      url(r'^basic-upload/$', views.BasicUploadView.as_view(), name='basic_upload')
 ]
