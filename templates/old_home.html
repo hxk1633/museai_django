@@ -1,0 +1,40 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+  <head>
+    <link href="{% static 'bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'bootstrap/css/sidebar.css' %}" rel="stylesheet">
+  </head>
+  <body>
+  {% block sidebar %}
+  <div class="sidebar">
+    <nav class="sidebar-nav">
+      <li class="nav-item">
+       <a class="nav-link" href="{% url 'my-albums' %}">
+         <i class="nav-icon cui-speedometer"></i> My Albums
+       </a>
+     </li>
+     <li class="nav-item">
+       <a class="nav-link" href="{% url 'basic_upload' %}">
+         <i class="nav-icon cui-speedometer"></i> My Videos
+       </a>
+     </li>
+    </nav>
+  </div>
+  {% endblock %}
+  {% if user.is_authenticated %}
+    <li>User: {{ user.get_username }}</li>
+    <li><a href="{% url 'my-albums' %}">My Albums</a></li>
+    <li><a href="{% url 'logout'%}?next={{request.path}}">Logout</a></li>
+  {% else %}
+    <li><a href="{% url 'login'%}?next={{request.path}}">Login</a></li>
+  {% endif %}
+  {% block content %}
+
+  {% endblock %}
+  <script src="{% static 'jquery-3.4.1.min.js' %}"></script>
+  <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
+  {% block javascript %}
+  {% endblock %}
+  </body>
+</html>
