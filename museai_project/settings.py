@@ -64,6 +64,7 @@ INSTALLED_APPS = [
     'django_celery_results',
     'rest_framework',
     'django_celery_beat',
+    'django_tables2'
 ]
 
 MIDDLEWARE = [
@@ -153,6 +154,7 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Redirect to home URL after login (Default redirects to /accounts/profile/)
-LOGIN_REDIRECT_URL = '/myalbums'
+LOGIN_REDIRECT_URL = '/albums'
+LOGOUT_REDIRECT_URL = '/accounts/login'
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

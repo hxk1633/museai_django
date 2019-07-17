@@ -15,8 +15,17 @@ from django.urls import reverse_lazy
 from django.shortcuts import redirect
 from .forms import VideoForm
 from django.http import JsonResponse
+from django.shortcuts import render
+from django_tables2 import RequestConfig
+from .tables import AlbumTable
+from django.contrib.auth.decorators import login_required
 
 
+@login_required
+def albums(request):
+    table = AlbumTable(Album.objects.filter(organization=request.user).order_by('name'))
+    RequestConfig(request).configure(table)
+    return render(request, 'images/album_list_created_user.html', {'table': table})
 
 
 class AlbumsByUserListView(LoginRequiredMixin,generic.ListView):
