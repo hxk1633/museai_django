@@ -17,5 +17,7 @@ api_urlpatterns = ([
 urlpatterns = [
     url(r'^api/', include(api_urlpatterns)),
     url(r'^basic-upload/$', views.BasicUploadView.as_view(), name='basic_upload'),
-    url(r'^albums/', albums, name='albums')
+    url(r'^albums/', albums, name='albums'),
+    url(r'^delete/(?P<pk>\d+)/$', views.AlbumDelete.as_view(), name='deleteAlbum'),
+    url(r'^edit/(?P<pk>\d+)/$', views.AlbumEdit.as_view(), name='editAlbum')
 ]

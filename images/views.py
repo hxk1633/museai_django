@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
 from images.serializers import VideoSerializer, AlbumSerializer
-from django.views.generic.edit import CreateView, DeleteView
+from django.views.generic.edit import CreateView, DeleteView, UpdateView
 import json
 from django.views import generic, View
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -27,13 +27,16 @@ def albums(request):
     RequestConfig(request).configure(table)
     return render(request, 'images/album_list_created_user.html', {'table': table})
 
+def get_context_data(self, **kwargs):
+    context = super().get_context_data(**kwargs)
+    context['table'] = AlbumTable(Album.objects.all(), _overriden_value="overriden value")
 
 class AlbumsByUserListView(LoginRequiredMixin,generic.ListView):
     """Generic class-based view listing albums to current user."""
     model = Album
     template_name ='images/album_list_created_user.html'
     paginate_by = 10
-
+    
     def get_queryset(self):
         return Album.objects.filter(organization=self.request.user).order_by('name')
 
@@ -45,11 +48,17 @@ class AlbumCreate(LoginRequiredMixin, CreateView):
         album.organization =  self.request.user
         album.save()
         form.save_m2m()
-        return redirect('/myalbums')
+        return redirect('/albums')
+
+class AlbumEdit(LoginRequiredMixin, UpdateView):
+    model = Album
+    fields = ['name', 'description']
+    template_name_suffix = '_edit_form'
+    success_url = reverse_lazy('albums')
 
 class AlbumDelete(LoginRequiredMixin, DeleteView):
     model = Album
-    success_url = reverse_lazy('myalbums')
+    success_url = reverse_lazy('albums')
 
 class HomePageView(ListView):
     model = Video
