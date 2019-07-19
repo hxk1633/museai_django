@@ -103,11 +103,11 @@ def update_filename(instance, filename):
 class Album(models.Model):
     name = models.CharField(max_length=50)
     description = models.CharField(max_length=255)
-    pin = models.CharField(editable=False, max_length=6)
+    pin = models.CharField(max_length=6)
     status = models.CharField(max_length=1, choices=ALBUM_STATUS, default='o')
     model_status = models.CharField(max_length=1, choices=MODEL_STATUS, default='s')
     id = models.AutoField(primary_key=True, auto_created=True)
-    organization = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    organization = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
 
 
     def save(self, *args, **kwargs):
@@ -135,10 +135,12 @@ class TFModel(models.Model):
         return self.name
 
 class Video(models.Model):
-    title = models.CharField(max_length=50, primary_key=True)
+    title = models.CharField(max_length=50)
     file = models.FileField(upload_to=update_filename)
-    album_vdo = models.ForeignKey(Album, on_delete=models.CASCADE, default="", null=True)
+    album = models.ForeignKey(Album, on_delete=models.CASCADE, default="")
     pin = models.CharField(max_length=6)
+    id = models.AutoField(primary_key=True, auto_created=True)
+
 
     def getFilePath(self):
         return self.file.path
@@ -151,6 +153,7 @@ class Video(models.Model):
         return "media/albums/" + name + ".zip"
 
     def getAlbumName(self):
+        print(self.pin)
         album = Album.objects.get(pin=self.pin)
         return album.name
 
@@ -158,20 +161,23 @@ class Video(models.Model):
         print("Converting video")
         album = Album.objects.get(pin=self.pin)
         album.model_status = 's'
-        album.save()
         super(Video, self).save(*args, **kwargs)
+        print(self.pin)
         convertVideo(self)
+        album.save()
         print("Conversion successful")
 
+    """
     @classmethod
     def create(cls, title, file, pin):
         album = Album.objects.get(pin=pin)
-        video = cls(title=title, file=file, album_vdo=album)
+        video = cls(title=title, file=file, album=album)
         return video
-
+    """
+    
     def __str__(self):
         return self.title
 
 post_delete.connect(file_cleanup, sender=Video, dispatch_uid="video.file_cleanup")
 post_delete.connect(file_cleanup, sender=Album, dispatch_uid="album.file_cleanup")
-pre_save.connect(new_pin, sender=Album, dispatch_uid="album.new_pin")
+#pre_save.connect(new_pin, sender=Album, dispatch_uid="album.new_pin")

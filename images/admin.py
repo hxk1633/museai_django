@@ -25,7 +25,7 @@ class AlbumAdmin(admin.ModelAdmin):
     actions = [close_album, open_album, create_model]
 
 class VideoAdmin(admin.ModelAdmin):
-    list_display = ['title', 'album_vdo']
+    list_display = ['title', 'album']
     ordering = ['title']
 
 class TFModelAdmin(admin.ModelAdmin):

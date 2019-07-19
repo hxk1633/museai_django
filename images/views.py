@@ -36,7 +36,7 @@ class AlbumsByUserListView(LoginRequiredMixin,generic.ListView):
     model = Album
     template_name ='images/album_list_created_user.html'
     paginate_by = 10
-    
+
     def get_queryset(self):
         return Album.objects.filter(organization=self.request.user).order_by('name')
 
@@ -83,7 +83,7 @@ class VideoViewSet(viewsets.ModelViewSet):
     serializer_class = VideoSerializer
 
     class Meta:
-        ordering = ['-id']
+        ordering = ['title']
 
     def post(self, request):
         serializer = VideoSerializer(data=request.data)

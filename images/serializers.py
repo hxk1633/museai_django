@@ -28,8 +28,7 @@ class VideoSerializer(serializers.ModelSerializer):
         return value
     """
     def create(self, validated_data):
-        vdo = Video.objects.create(title=validated_data["title"], file=validated_data["file"], pin=validated_data["pin"])
-        print(vdo.getAlbumName())
+        vdo = Video.objects.create(title=validated_data["title"], file=validated_data["file"], album=Album.objects.get(pin=validated_data["pin"]), pin=validated_data["pin"])
         return vdo
 
     def validate(self, data):
@@ -50,7 +49,7 @@ class VideoSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Video
-        fields = ('title', 'album_vdo', 'pin', 'file')
+        fields = ('title', 'album', 'pin', 'file')
 
 class AlbumSerializer(serializers.ModelSerializer):
     class Meta:
