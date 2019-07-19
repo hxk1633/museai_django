@@ -16,6 +16,10 @@
 
   <!-- Custom styles for this template -->
   <link href="{% static 'bootstrap/css/simple-sidebar.css' %}" rel="stylesheet">
+  <script src="{% static 'jquery-3.4.1.min.js' %}"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.15.0/umd/popper.min.js"></script>
+  <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
+
 
   <link rel='stylesheet' href='https://use.fontawesome.com/releases/v5.7.0/css/all.css' integrity='sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ' crossorigin='anonymous'>
   <style>
@@ -23,6 +27,14 @@
     position: relative;
     top:-1px;
     right: 1px;
+}
+.table tr {
+    cursor: pointer;
+}
+.hiddenRow {
+    padding: 0 4px !important;
+    background-color: #eeeeee;
+    font-size: 13px;
 }
   </style>
 </head>
@@ -92,21 +104,88 @@
         {% endblock %}
       </div>
     </div>
+    <div class="modal fade" id="edit" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h5 class="modal-title" id="exampleModalLabel">My modal</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">×</span>
+                  </button>
+              </div>
+              <div class="modal-body">
+                  ... remote content from "data-remote" loads here ...
+              </div>
+              <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                  <button type="button" class="btn btn-primary">Save changes</button>
+              </div>
+          </div>
+      </div>
+  </div>
+
+  <div class="modal fade" id="delete" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">My modal</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                ... remote content from "data-remote" loads here ...
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
     <!-- /#page-content-wrapper -->
 
   </div>
   <!-- /#wrapper -->
 
   <!-- Bootstrap core JavaScript -->
-  <script src="{% static 'jquery-3.4.1.min.js' %}"></script>
-  <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
 
   <!-- Menu Toggle Script -->
   <script>
+  $('tbody').find('tr').each(function(i, el) {
+           var id = $(el).attr("data-target");
+           id = id.substr(1);
+           $(el).after("<tr><td colspan='100%' class='hiddenRow'><div id='"+id+"' class='accordion-body collapse'>{% for video in videos %}<a href='{{ video.file.url }}'>{{ video.file.name }}</a>{% endfor %}</div></td></tr>");
+    });
     $("#menu-toggle").click(function(e) {
       e.preventDefault();
       $("#wrapper").toggleClass("toggled");
     });
+    $('#edit').on('show.bs.modal', function (e) {
+
+    var button = $(e.relatedTarget);
+    var modal = $(this);
+
+    // load content from HTML string
+    //modal.find('.modal-body').html("Nice modal body baby...");
+
+    // or, load content from value of data-remote url
+    modal.find('.modal-body').load(button.data("remote"));
+
+});
+$('#delete').on('show.bs.modal', function (e) {
+
+var button = $(e.relatedTarget);
+var modal = $(this);
+
+// load content from HTML string
+//modal.find('.modal-body').html("Nice modal body baby...");
+
+// or, load content from value of data-remote url
+modal.find('.modal-body').load(button.data("remote"));
+
+});
+
     function toggle(source) {
     checkboxes = document.getElementsByName('selection');
     for(var i in checkboxes)

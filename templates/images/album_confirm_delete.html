@@ -1,14 +1,9 @@
-{% extends "home.html" %}
 
 {% block content %}
 
-<h1>Delete Album</h1>
-
-<p>Are you sure you want to delete the album: {{ album }}?</p>
-
-<form action="" method="POST">
-  {% csrf_token %}
-  <input type="submit" value="Yes, delete.">
+<form action="r'^delete/(?P<pk>\d+)/$'" method="post">{% csrf_token %}
+    <p>Are you sure you want to delete "{{ object }}"?</p>
+    <input type="submit" value="Confirm">
 </form>
 
 {% endblock %}
