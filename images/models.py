@@ -16,7 +16,7 @@ from django.db import models
 from django.db.models.signals import post_delete, pre_save
 from django.core.files.storage import default_storage
 from django.contrib.auth.models import User
-
+from django.urls import reverse_lazy
 
 MODEL_STATUS = [
     ('s','todo'),
@@ -109,6 +109,9 @@ class Album(models.Model):
     id = models.AutoField(primary_key=True, auto_created=True)
     organization = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
 
+    def get_absolute_url(self):
+        return reverse_lazy('albums')
+
 
     def save(self, *args, **kwargs):
         #self.pin = get_random_string(length=6).upper()
@@ -174,10 +177,10 @@ class Video(models.Model):
         video = cls(title=title, file=file, album=album)
         return video
     """
-    
+
     def __str__(self):
         return self.title
 
 post_delete.connect(file_cleanup, sender=Video, dispatch_uid="video.file_cleanup")
 post_delete.connect(file_cleanup, sender=Album, dispatch_uid="album.file_cleanup")
-#pre_save.connect(new_pin, sender=Album, dispatch_uid="album.new_pin")
+pre_save.connect(new_pin, sender=Album, dispatch_uid="album.new_pin")

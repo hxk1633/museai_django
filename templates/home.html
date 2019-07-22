@@ -19,6 +19,8 @@
   <script src="{% static 'jquery-3.4.1.min.js' %}"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.15.0/umd/popper.min.js"></script>
   <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
+  <script src="{% static 'js/jquery.bootstrap.modal.forms.min.js' %}"></script>
+
 
 
   <link rel='stylesheet' href='https://use.fontawesome.com/releases/v5.7.0/css/all.css' integrity='sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ' crossorigin='anonymous'>
@@ -69,7 +71,7 @@
           <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
             {% if user.is_authenticated %}
             <li class="nav-item">
-              <a class="nav-link" href="{% url 'album_create' %}">
+              <a class="nav-link" href="#" id="create-album">
                 <i class="fas fa-plus fa-xs"></i>
                 Create Album
               </a>
@@ -104,6 +106,13 @@
         {% endblock %}
       </div>
     </div>
+    <div class="modal fade" tabindex="-1" role="dialog" id="modal">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+    </div>
+    </div>
+  </div>
+    <!---
     <div class="modal fade" id="edit" tabindex="-1" role="dialog">
       <div class="modal-dialog" role="document">
           <div class="modal-content">
@@ -143,6 +152,7 @@
         </div>
     </div>
 </div>
+-->
     <!-- /#page-content-wrapper -->
 
   </div>
@@ -152,6 +162,17 @@
 
   <!-- Menu Toggle Script -->
   <script>
+
+  $("#create-album").modalForm({
+       formURL: "{% url 'album_create' %}"
+   });
+   $(".update-album").each(function () {
+     $(this).modalForm({formURL: $(this).data('id')});
+   });
+   $(".delete-album").each(function () {
+      $(this).modalForm({formURL: $(this).data('id')});
+    });
+
   $('tbody').find('tr').each(function(i, el) {
            var id = $(el).attr("data-target");
            id = id.substr(1);
@@ -161,18 +182,6 @@
       e.preventDefault();
       $("#wrapper").toggleClass("toggled");
     });
-    $('#edit').on('show.bs.modal', function (e) {
-
-    var button = $(e.relatedTarget);
-    var modal = $(this);
-
-    // load content from HTML string
-    //modal.find('.modal-body').html("Nice modal body baby...");
-
-    // or, load content from value of data-remote url
-    modal.find('.modal-body').load(button.data("remote"));
-
-});
 $('#delete').on('show.bs.modal', function (e) {
 
 var button = $(e.relatedTarget);

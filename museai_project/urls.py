@@ -26,7 +26,10 @@ urlpatterns = [
     path('', include('images.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
     path('myalbums/', views.AlbumsByUserListView.as_view(), name='my-albums'),
-    path('myalbums/create/', views.AlbumCreate.as_view(), name='album_create'),
+    path('myalbums/create/', views.AlbumCreateView.as_view(), name='album_create'),
+    path('myalbums/update/<int:pk>', views.AlbumUpdateView.as_view(), name='update_album'),
+    path('myalbums/delete/<int:pk>', views.AlbumDeleteView.as_view(), name='delete_album'),
+
 ]
 
 if settings.DEBUG:

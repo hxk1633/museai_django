@@ -13,12 +13,21 @@ from django.views import generic, View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.shortcuts import redirect
-from .forms import VideoForm
+from .forms import VideoForm, AlbumForm
 from django.http import JsonResponse
 from django.shortcuts import render
 from django_tables2 import RequestConfig
 from .tables import AlbumTable
 from django.contrib.auth.decorators import login_required
+from bootstrap_modal_forms.generic import (BSModalCreateView,
+                                           BSModalUpdateView,
+                                           BSModalReadView,
+                                           BSModalDeleteView)
+from bootstrap_modal_forms.mixins import PassRequestMixin
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+from django.contrib.auth.models import User
+
 
 
 @login_required
@@ -40,24 +49,23 @@ class AlbumsByUserListView(LoginRequiredMixin,generic.ListView):
     def get_queryset(self):
         return Album.objects.filter(organization=self.request.user).order_by('name')
 
-class AlbumCreate(LoginRequiredMixin, CreateView):
-    model = Album
-    fields = ['name','description']
-    def form_valid(self, form):
-        album = form.save(commit=False)
-        album.organization =  self.request.user
-        album.save()
-        form.save_m2m()
-        return redirect('/albums')
-
-class AlbumEdit(LoginRequiredMixin, UpdateView):
-    model = Album
-    fields = ['name', 'description']
-    template_name_suffix = '_edit_form'
+class AlbumCreateView(PassRequestMixin, CreateView):
+    template_name = 'images/album_form.html'
+    form_class = AlbumForm
+    success_message = 'Success: Album was created.'
     success_url = reverse_lazy('albums')
 
-class AlbumDelete(LoginRequiredMixin, DeleteView):
+class AlbumUpdateView(LoginRequiredMixin, BSModalUpdateView):
     model = Album
+    template_name = 'images/album_edit_form.html'
+    form_class = AlbumForm
+    success_message = 'Success: Album was updated.'
+    success_url = reverse_lazy('albums')
+
+class AlbumDeleteView(LoginRequiredMixin, BSModalDeleteView):
+    model = Album
+    template_name = 'images/album_confirm_delete.html'
+    success_message = 'Success: Album was deleted.'
     success_url = reverse_lazy('albums')
 
 class HomePageView(ListView):
