@@ -29,12 +29,12 @@ from django.urls import reverse
 from django.contrib.auth.models import User
 
 
-
 @login_required
 def albums(request):
     table = AlbumTable(Album.objects.filter(organization=request.user).order_by('name'))
     RequestConfig(request).configure(table)
     return render(request, 'images/album_list_created_user.html', {'table': table})
+
 
 def get_context_data(self, **kwargs):
     context = super().get_context_data(**kwargs)
@@ -106,3 +106,10 @@ class VideoViewSet(viewsets.ModelViewSet):
 class AlbumViewSet(viewsets.ModelViewSet):
     queryset = Album.objects.all()
     serializer_class = AlbumSerializer
+
+def load_videos(request):
+    album_id = request.GET.get('album')
+    print(album_id)
+    videos = Video.objects.filter(album_id=album_id).order_by('title')
+    print(videos)
+    return render(request, 'videos/load_videos.html', {'videos': videos})

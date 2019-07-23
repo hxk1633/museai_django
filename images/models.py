@@ -144,7 +144,6 @@ class Video(models.Model):
     pin = models.CharField(max_length=6)
     id = models.AutoField(primary_key=True, auto_created=True)
 
-
     def getFilePath(self):
         return self.file.path
 

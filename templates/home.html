@@ -20,9 +20,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.15.0/umd/popper.min.js"></script>
   <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
   <script src="{% static 'js/jquery.bootstrap.modal.forms.min.js' %}"></script>
-
-
-
   <link rel='stylesheet' href='https://use.fontawesome.com/releases/v5.7.0/css/all.css' integrity='sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ' crossorigin='anonymous'>
   <style>
   .fa-plus{
@@ -37,6 +34,69 @@
     padding: 0 4px !important;
     background-color: #eeeeee;
     font-size: 13px;
+}
+.videos {
+  width:100%;
+  clear: both;
+}
+#fade {
+  display: none;
+  position: fixed;
+  top: 0%;
+  left: 0%;
+  width: 100%;
+  height: 100%;
+  background-color: black;
+  z-index: 1001;
+  -moz-opacity: 0.8;
+  opacity: .80;
+  filter: alpha(opacity=80);
+}
+
+#light {
+  display: none;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  max-width: 600px;
+  max-height: 360px;
+  margin-left: -300px;
+  margin-top: -180px;
+  border: 2px solid #FFF;
+  background: #FFF;
+  z-index: 1002;
+  overflow: visible;
+}
+
+#boxclose {
+  float: right;
+  cursor: pointer;
+  color: #fff;
+  border: 1px solid #AEAEAE;
+  border-radius: 3px;
+  background: #222222;
+  font-size: 31px;
+  font-weight: bold;
+  display: inline-block;
+  line-height: 0px;
+  padding: 11px 3px;
+  position: absolute;
+  right: 2px;
+  top: 2px;
+  z-index: 1002;
+  opacity: 0.9;
+}
+
+.boxclose:before {
+  content: "×";
+}
+
+#fade:hover ~ #boxclose {
+  display:none;
+}
+
+.test:hover ~ .test2 {
+  display: none;
 }
   </style>
 </head>
@@ -112,47 +172,15 @@
     </div>
     </div>
   </div>
-    <!---
-    <div class="modal fade" id="edit" tabindex="-1" role="dialog">
-      <div class="modal-dialog" role="document">
-          <div class="modal-content">
-              <div class="modal-header">
-                  <h5 class="modal-title" id="exampleModalLabel">My modal</h5>
-                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                      <span aria-hidden="true">×</span>
-                  </button>
-              </div>
-              <div class="modal-body">
-                  ... remote content from "data-remote" loads here ...
-              </div>
-              <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                  <button type="button" class="btn btn-primary">Save changes</button>
-              </div>
-          </div>
-      </div>
-  </div>
-
-  <div class="modal fade" id="delete" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">My modal</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">×</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                ... remote content from "data-remote" loads here ...
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary">Save changes</button>
-            </div>
-        </div>
-    </div>
+  <div id="light">
+<a class="boxclose" id="boxclose" onclick="lightbox_close();"></a>
+<video id="VisaChipCardVideo" width="600" controls>
+  <source src="" type="video/mp4">
+</video>
 </div>
--->
+
+<div id="fade" onClick="lightbox_close();"></div>
+
     <!-- /#page-content-wrapper -->
 
   </div>
@@ -173,11 +201,54 @@
       $(this).modalForm({formURL: $(this).data('id')});
     });
 
+    window.document.onkeydown = function(e) {
+  if (!e) {
+    e = event;
+  }
+  if (e.keyCode == 27) {
+    lightbox_close();
+  }
+}
+
+function lightbox_open(url) {
+  window.scrollTo(0, 0);
+  $('#light').css('display', 'block');
+  $('#fade').css('display', 'block');
+  console.log(url);
+  $('#VisaChipCardVideo source').attr('src', url);
+  $("#VisaChipCardVideo")[0].load();
+  $('#VisaChipCardVideo')[0].play();
+  console.log("play")
+}
+
+function lightbox_close() {
+  $('#light').css('display', 'none');
+  $('#fade').css('display', 'none');
+  $('#VisaChipCardVideo')[0].pause();
+}
+
+
   $('tbody').find('tr').each(function(i, el) {
            var id = $(el).attr("data-target");
            id = id.substr(1);
-           $(el).after("<tr><td colspan='100%' class='hiddenRow'><div id='"+id+"' class='accordion-body collapse'>{% for video in videos %}<a href='{{ video.file.url }}'>{{ video.file.name }}</a>{% endfor %}</div></td></tr>");
+           $(el).after("<div data-videos-url='{% url 'ajax_load_videos' %}' id='"+id+"' class='videos accordion-body collapse'></div>");
     });
+    $("tr").click(function () {
+        var albumId = $(this).attr('id');
+        console.log(albumId);
+        $.ajax({                       // initialize an AJAX request
+          url: "{% url 'ajax_load_videos' %}",                    // set the url of the request (= localhost:8000/hr/ajax/load-cities/)
+          data: {
+            'album': albumId       // add the country id to the GET parameters
+          },
+          success: function (data) {   // `data` is the return of the `load_cities` view function
+            $("#album" + albumId).html(data);
+            console.log(data); // replace the contents of the city input with the data that came from the server
+          }
+        });
+
+
+      });
     $("#menu-toggle").click(function(e) {
       e.preventDefault();
       $("#wrapper").toggleClass("toggled");
