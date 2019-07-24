@@ -1,0 +1,5 @@
+{% for video in videos %}
+    <tr>
+      <td><a href="#" onclick="lightbox_open('{{ video.file.url }}');">{{ video.file.name }}</a></td>
+    </tr>
+{% endfor %}
