@@ -10,7 +10,7 @@ TEMPLATE = '''
     </button>
 
       <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-        <a class="dropdown-item" id="view">View Album</a>
+        <a class="dropdown-item" href="#" id="viewAlbum" data-toggle="collapse">View Album</a>
         <a class="update-album dropdown-item" data-toggle="modal" data-id="{% url 'update_album' record.pk %}">Edit Album</a>
         <a class="delete-album dropdown-item" data-toggle="modal" data-id="{% url 'delete_album' record.pk %}">Delete Album</a>
       </div>
@@ -34,10 +34,9 @@ class AlbumTable(LoginRequiredMixin, tables.Table):
         sequence = ('selection', 'name', 'description', 'pin', 'status', 'model_status', 'actions')
         exclude = ('id', 'organization',)
         row_attrs = {
-            'data-toggle': 'collapse',
-            'data-target': lambda record: "#album" + str(record.pk),
-            'class':'accordion-toggle',
-            'id': lambda record: record.pk
+            #'data-toggle': 'collapse',
+            'id': lambda record: "row" + str(record.pk),
+            #'class':'accordion-toggle',
         }
         attrs = {
             'id': 'albumTable',

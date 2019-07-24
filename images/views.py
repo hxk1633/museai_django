@@ -27,6 +27,8 @@ from bootstrap_modal_forms.mixins import PassRequestMixin
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.contrib.auth.models import User
+from django.views.decorators.csrf import csrf_exempt
+from images.tasks import new_model
 
 
 @login_required
@@ -35,7 +37,24 @@ def albums(request):
     RequestConfig(request).configure(table)
     return render(request, 'images/album_list_created_user.html', {'table': table})
 
+@csrf_exempt #Add this too.
+def Albums_Actions(request, id=None):
 
+    if request.method == 'POST':
+        if 'delete' in request.POST:
+            id_list = request.POST.getlist('selection')
+            print(id_list)
+            for album_id in id_list:
+                Album.objects.get(pk=album_id).delete()
+            return HttpResponseRedirect(reverse_lazy('albums'))
+        elif 'train' in request.POST:
+            id_list = request.POST.getlist('selection')
+            print(id_list)
+            for album_id in id_list:
+                album = Album.objects.get(pk=album_id)
+                new_model.apply_async(args=[album.id], countdown=5)
+            return HttpResponseRedirect(reverse_lazy('albums'))
+            
 def get_context_data(self, **kwargs):
     context = super().get_context_data(**kwargs)
     context['table'] = AlbumTable(Album.objects.all(), _overriden_value="overriden value")

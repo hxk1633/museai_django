@@ -39,6 +39,12 @@
   width:100%;
   clear: both;
 }
+
+video {
+  width: 600px;
+  height: 360px;
+}
+
 #fade {
   display: none;
   position: fixed;
@@ -65,7 +71,7 @@
   border: 2px solid #FFF;
   background: #FFF;
   z-index: 1002;
-  overflow: visible;
+  overflow: hidden;
 }
 
 #boxclose {
@@ -97,6 +103,11 @@
 
 .test:hover ~ .test2 {
   display: none;
+}
+.action-bar button {
+  float:right;
+  margin: 10px;
+  visibility: hidden;
 }
   </style>
 </head>
@@ -157,7 +168,12 @@
           </ul>
         </div>
       </nav>
-
+      <form action="{% url 'actions-albums' %}" method="POST">
+      <div class="action-bar container-fluid">
+        <button type="submit" name="delete" class="btn btn-primary">Delete Album</button>
+        <button type="button" class="btn btn-primary">Merge Albums</button>
+        <button type="submit" name="train" class="btn btn-primary">Train Album</button>
+      </div>
       <div class="container-fluid">
         {% block content %}
         <h1 class="mt-4">Simple Sidebar</h1>
@@ -165,6 +181,7 @@
         <p>Make sure to keep all page content within the <code>#page-content-wrapper</code>. The top navbar is optional, and just for demonstration. Just create an element with the <code>#menu-toggle</code> ID which will toggle the menu when clicked.</p>
         {% endblock %}
       </div>
+    </form>
     </div>
     <div class="modal fade" tabindex="-1" role="dialog" id="modal">
       <div class="modal-dialog" role="document">
@@ -229,12 +246,14 @@ function lightbox_close() {
 
 
   $('tbody').find('tr').each(function(i, el) {
-           var id = $(el).attr("data-target");
-           id = id.substr(1);
-           $(el).after("<div data-videos-url='{% url 'ajax_load_videos' %}' id='"+id+"' class='videos accordion-body collapse'></div>");
+           var id = $(el).attr("id");
+           id = id.substr(3);
+           $(el).find("#viewAlbum").attr("href", "#album" + id);
+           $(el).after("<div data-videos-url='{% url 'ajax_load_videos' %}' id='album"+id+"' class='videos accordion-body collapse'></div>");
     });
-    $("tr").click(function () {
-        var albumId = $(this).attr('id');
+    $("a#viewAlbum").click(function () {
+        var albumId = $(this).attr('href');
+        albumId = albumId.substr(6);
         console.log(albumId);
         $.ajax({                       // initialize an AJAX request
           url: "{% url 'ajax_load_videos' %}",                    // set the url of the request (= localhost:8000/hr/ajax/load-cities/)
@@ -271,6 +290,15 @@ modal.find('.modal-body').load(button.data("remote"));
     for(var i in checkboxes)
         checkboxes[i].checked = source.checked;
       }
+
+      $("[name='selection']").change(function() {
+        if ($("#albumTable input:checkbox:checked").length > 0) {
+          $(".action-bar button").css("visibility","visible");
+        }
+        else {
+          $(".action-bar button").css("visibility","hidden");
+        }
+});
   </script>
 
 

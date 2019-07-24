@@ -19,7 +19,7 @@ from django.contrib.auth.models import User
 from django.urls import reverse_lazy
 
 MODEL_STATUS = [
-    ('s','todo'),
+    ('s','Not trained'),
     ('t', 'Training'),
     ('c', 'Created'),
 ]
