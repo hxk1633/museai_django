@@ -123,6 +123,7 @@ class Album(models.Model):
             pass
         super(Album, self).save(*args, **kwargs)
 
+
     def to_json(self):  # New special method.
         return '{"name": "%s", "description": "%s", "pin": "%s", "status": "%s", "model_status": "%s"}' % (self.name, self.description, self.pin, self.status, self.model_status)
 
@@ -180,6 +181,6 @@ class Video(models.Model):
     def __str__(self):
         return self.title
 
-post_delete.connect(file_cleanup, sender=Video, dispatch_uid="video.file_cleanup")
-post_delete.connect(file_cleanup, sender=Album, dispatch_uid="album.file_cleanup")
+#post_delete.connect(file_cleanup, sender=Video, dispatch_uid="video.file_cleanup")
+#post_delete.connect(file_cleanup, sender=Album, dispatch_uid="album.file_cleanup")
 pre_save.connect(new_pin, sender=Album, dispatch_uid="album.new_pin")

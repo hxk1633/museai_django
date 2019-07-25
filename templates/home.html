@@ -36,8 +36,7 @@
     font-size: 13px;
 }
 .videos {
-  width:100%;
-  clear: both;
+  float:left;
 }
 
 video {
@@ -298,6 +297,22 @@ modal.find('.modal-body').load(button.data("remote"));
         else {
           $(".action-bar button").css("visibility","hidden");
         }
+});
+$(".js-upload-videos").click(function () {
+  console.log("clicked");
+  $("#fileupload").click();
+});
+
+/* 2. INITIALIZE THE FILE UPLOAD COMPONENT */
+$("#fileupload").fileupload({
+  dataType: 'json',
+  done: function (e, data) {  /* 3. PROCESS THE RESPONSE FROM THE SERVER */
+    if (data.result.is_valid) {
+      $("#gallery tbody").prepend(
+        "<a style='display:block;' href='" + data.result.url + "'>" + data.result.name + "</a>"
+      )
+    }
+  }
 });
   </script>
 

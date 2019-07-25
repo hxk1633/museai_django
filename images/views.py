@@ -29,6 +29,8 @@ from django.urls import reverse
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt
 from images.tasks import new_model
+from django.utils.decorators import method_decorator
+
 
 
 @login_required
@@ -54,7 +56,7 @@ def Albums_Actions(request, id=None):
                 album = Album.objects.get(pk=album_id)
                 new_model.apply_async(args=[album.id], countdown=5)
             return HttpResponseRedirect(reverse_lazy('albums'))
-            
+
 def get_context_data(self, **kwargs):
     context = super().get_context_data(**kwargs)
     context['table'] = AlbumTable(Album.objects.all(), _overriden_value="overriden value")
@@ -68,11 +70,23 @@ class AlbumsByUserListView(LoginRequiredMixin,generic.ListView):
     def get_queryset(self):
         return Album.objects.filter(organization=self.request.user).order_by('name')
 
-class AlbumCreateView(PassRequestMixin, CreateView):
+class AlbumCreateView(BSModalCreateView, PassRequestMixin):
     template_name = 'images/album_form.html'
     form_class = AlbumForm
     success_message = 'Success: Album was created.'
     success_url = reverse_lazy('albums')
+    """
+    def get_form_kwargs(self, **kwargs):
+        kwargs = super(PassRequestMixin, self).get_form_kwargs()
+        kwargs.update({"organization": self.request.user})
+        return kwargs
+        """
+
+    """
+    def get_initial(self):
+        return { 'organization': self.request.user }
+    """
+
 
 class AlbumUpdateView(LoginRequiredMixin, BSModalUpdateView):
     model = Album

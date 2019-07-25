@@ -12,17 +12,23 @@ class VideoForm(forms.ModelForm):
         model = Video
         fields = ('title', 'album', 'file' )
 
-class AlbumForm(PopRequestMixin, CreateUpdateAjaxMixin, forms.ModelForm):
+class AlbumForm(BSModalForm):
     class Meta:
         model = Album
         fields = ['name', 'description']
+    """
+    def __init__(self, *args, **kwargs):
+        self.organization = kwargs.pop("organization", None)
+        print(self.organization)
+        super(PopRequestMixin, self).__init__(*args, **kwargs)
+    """
+    def save(self, commit=False):
 
-    def save(self, commit=True):
         if not self.request.is_ajax():
             instance = super(CreateUpdateAjaxMixin, self).save(commit=commit)
             instance.organization = User.objects.get(pk=self.request.user.pk)
             instance.save()
         else:
-            instance = super(CreateUpdateAjaxMixin, self).save(commit=True)
+            instance = super(CreateUpdateAjaxMixin, self).save(commit=False)
 
         return instance

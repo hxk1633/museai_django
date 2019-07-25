@@ -10,12 +10,10 @@
   <script src="{% static 'jquery-file-upload/jquery.iframe-transport.js' %}"></script>
   <script src="{% static 'jquery-file-upload/jquery.fileupload.js' %}"></script>
 
-  {# PHOTOS PAGE SCRIPTS #}
-  <script src="{% static 'basic-upload.js' %}"></script>
 {% endblock %}
 
 {% block content %}
-  <div style="margin-bottom: 20px;">
+  <div style="margin: 20px;">
     <button type="button" class="btn btn-primary js-upload-videos">
       <span class="glyphicon glyphicon-cloud-upload"></span> Upload videos
     </button>
@@ -24,19 +22,7 @@
            data-url="{% url 'basic_upload' %}"
            data-form-data='{"csrfmiddlewaretoken": "{{ csrf_token }}"}'>
   </div>
-
-  <table id="gallery" class="table table-bordered">
-    <thead>
-      <tr>
-        <th>Video</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for video in videos %}
-        <tr>
-          <td><a href="{{ video.file.url }}">{{ video.file.name }}</a></td>
-        </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+  {% for video in videos %}
+    <a style="display:block;" href="{{ video.file.url }}">{{ video.file.name }}</a>
+  {% endfor %}
 {% endblock %}
