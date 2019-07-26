@@ -112,7 +112,6 @@ class Album(models.Model):
     def get_absolute_url(self):
         return reverse_lazy('albums')
 
-
     def save(self, *args, **kwargs):
         #self.pin = get_random_string(length=6).upper()
         try:

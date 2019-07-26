@@ -10,7 +10,19 @@ from bootstrap_modal_forms.mixins import PopRequestMixin, CreateUpdateAjaxMixin
 class VideoForm(forms.ModelForm):
     class Meta:
         model = Video
-        fields = ('title', 'album', 'file' )
+        fields = ('file', )
+
+    def save(self, pk, name, commit=True):
+        print("save:" + str(pk))
+        print("name:" + name.split('.')[0])
+        instance = super(VideoForm, self).save(commit=False)
+        instance.pin = Album.objects.get(pk=pk).pin
+        instance.album = Album.objects.get(pk=pk)
+        instance.title = name.split('.')[0]
+        if commit:
+            instance.save()
+        return instance
+
 
 class AlbumForm(BSModalForm):
     class Meta:

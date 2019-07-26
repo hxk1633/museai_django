@@ -21,6 +21,9 @@
   <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
   <script src="{% static 'js/jquery.bootstrap.modal.forms.min.js' %}"></script>
   <link rel='stylesheet' href='https://use.fontawesome.com/releases/v5.7.0/css/all.css' integrity='sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ' crossorigin='anonymous'>
+  <script src="{% static 'jquery-file-upload/vendor/jquery.ui.widget.js' %}"></script>
+  <script src="{% static 'jquery-file-upload/jquery.iframe-transport.js' %}"></script>
+  <script src="{% static 'jquery-file-upload/jquery.fileupload.js' %}"></script>
   <style>
   .fa-plus{
     position: relative;
@@ -121,7 +124,6 @@ video {
       <div class="sidebar-heading">Museai Web Portal</div>
       <div class="list-group list-group-flush">
         <a href="{% url 'albums' %}" class="list-group-item list-group-item-action bg-light">My Albums</a>
-        <a href="{% url 'basic_upload' %}" class="list-group-item list-group-item-action bg-light">My Videos</a>
       </div>
     </div>
     {% endblock %}
@@ -298,22 +300,38 @@ modal.find('.modal-body').load(button.data("remote"));
           $(".action-bar button").css("visibility","hidden");
         }
 });
-$(".js-upload-videos").click(function () {
-  console.log("clicked");
-  $("#fileupload").click();
-});
 
-/* 2. INITIALIZE THE FILE UPLOAD COMPONENT */
+$(".js-upload-videos").click(function () {
+  id = $(this).attr("data-id");
+  $("#fileupload" + id).click();
+  $("#fileupload" + id).fileupload({
+    dataType: 'json',
+    done: function (e, data) {  /* 3. PROCESS THE RESPONSE FROM THE SERVER */
+      if (data.result.is_valid) {
+        console.log(data.result.url);
+        console.log(data.result.name);
+      } else {
+        console.log("wrong");
+        console.log(e);
+      }
+    }
+  });
+});
+/*
+
 $("#fileupload").fileupload({
   dataType: 'json',
-  done: function (e, data) {  /* 3. PROCESS THE RESPONSE FROM THE SERVER */
+  done: function (e, data) {
     if (data.result.is_valid) {
-      $("#gallery tbody").prepend(
-        "<a style='display:block;' href='" + data.result.url + "'>" + data.result.name + "</a>"
-      )
+      console.log(data.result.url);
+      console.log(data.result.name);
+    } else {
+      console.log("wrong");
+      console.log(e);
     }
   }
 });
+*/
   </script>
 
 

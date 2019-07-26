@@ -110,11 +110,11 @@ class BasicUploadView(LoginRequiredMixin, View):
         video_list = Video.objects.all()
         return render(self.request, 'basic_upload/index.html', {'videos': video_list})
 
-    def post(self, request):
+    def post(self, request, pk):
         form = VideoForm(self.request.POST, self.request.FILES)
         if form.is_valid():
-            video = form.save()
-            data = {'is_valid': True, 'name': video.file.name, 'url': video.file.url}
+            video = form.save(pk, self.request.FILES['file'].name)
+            data = {'is_valid': True, 'name': video.file.name,  'url': video.file.url}
         else:
             data = {'is_valid': False}
         return JsonResponse(data)
