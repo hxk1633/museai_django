@@ -45,6 +45,15 @@ def file_cleanup(sender, instance, **kwargs):
     if isinstance(instance, Video):
         path = instance.getFilePath()
         os.remove(path)
+        print(instance.getAlbumName())
+        print(instance.getFileName())
+        basePath = "media/albums/" + instance.getAlbumName() + "/data/images/"
+        dirPath = "media/albums/" + instance.getAlbumName() + "/data/images/" + instance.getFileName()
+        fileList = os.listdir(dirPath)
+        for fileName in fileList:
+            os.remove(dirPath+"/"+fileName)
+        os.remove(basePath + instance.getFileName() + ".zip")
+        os.rmdir(dirPath)
     elif isinstance(instance, Album):
         os.rmdir("media/albums/" + instance.name + "/data/images/")
         os.rmdir("media/albums/" + instance.name + "/data/")
@@ -155,18 +164,15 @@ class Video(models.Model):
         return "media/albums/" + name + ".zip"
 
     def getAlbumName(self):
-        print(self.pin)
-        album = Album.objects.get(pin=self.pin)
-        return album.name
+        return self.album.name
 
     def save(self, *args, **kwargs):
         print("Converting video")
-        album = Album.objects.get(pin=self.pin)
-        album.model_status = 's'
+        self.album.model_status = 's'
         super(Video, self).save(*args, **kwargs)
         print(self.pin)
         convertVideo(self)
-        album.save()
+        self.album.save()
         print("Conversion successful")
 
     """
@@ -180,6 +186,6 @@ class Video(models.Model):
     def __str__(self):
         return self.title
 
-#post_delete.connect(file_cleanup, sender=Video, dispatch_uid="video.file_cleanup")
-#post_delete.connect(file_cleanup, sender=Album, dispatch_uid="album.file_cleanup")
+post_delete.connect(file_cleanup, sender=Video, dispatch_uid="video.file_cleanup")
+post_delete.connect(file_cleanup, sender=Album, dispatch_uid="album.file_cleanup")
 pre_save.connect(new_pin, sender=Album, dispatch_uid="album.new_pin")

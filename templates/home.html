@@ -30,6 +30,9 @@
     top:-1px;
     right: 1px;
 }
+.table {
+  table-layout: fixed;
+}
 .table tr {
     cursor: pointer;
 }
@@ -177,9 +180,6 @@ video {
       </div>
       <div class="container-fluid">
         {% block content %}
-        <h1 class="mt-4">Simple Sidebar</h1>
-        <p>The starting state of the menu will appear collapsed on smaller screens, and will appear non-collapsed on larger screens. When toggled using the button below, the menu will change.</p>
-        <p>Make sure to keep all page content within the <code>#page-content-wrapper</code>. The top navbar is optional, and just for demonstration. Just create an element with the <code>#menu-toggle</code> ID which will toggle the menu when clicked.</p>
         {% endblock %}
       </div>
     </form>
@@ -190,6 +190,20 @@ video {
     </div>
     </div>
   </div>
+  <div class="modal fade" id="modal-progress" data-backdrop="static" data-keyboard="false">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Uploading...</h4>
+      </div>
+      <div class="modal-body">
+        <div class="progress">
+          <div class="progress-bar" role="progressbar" style="width: 0%;">0%</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
   <div id="light">
 <a class="boxclose" id="boxclose" onclick="lightbox_close();"></a>
 <video id="VisaChipCardVideo" width="600" controls>
@@ -219,7 +233,8 @@ video {
       $(this).modalForm({formURL: $(this).data('id')});
     });
 
-    window.document.onkeydown = function(e) {
+
+window.document.onkeydown = function(e) {
   if (!e) {
     e = event;
   }
@@ -250,23 +265,27 @@ function lightbox_close() {
            var id = $(el).attr("id");
            id = id.substr(3);
            $(el).find("#viewAlbum").attr("href", "#album" + id);
-           $(el).after("<div data-videos-url='{% url 'ajax_load_videos' %}' id='album"+id+"' class='videos accordion-body collapse'></div>");
+           $(el).after("<tbody data-videos-url='{% url 'ajax_load_videos' %}' id='album"+id+"' class='videos accordion-body collapse'></tbody>");
     });
     $("a#viewAlbum").click(function () {
         var albumId = $(this).attr('href');
         albumId = albumId.substr(6);
         console.log(albumId);
-        $.ajax({                       // initialize an AJAX request
-          url: "{% url 'ajax_load_videos' %}",                    // set the url of the request (= localhost:8000/hr/ajax/load-cities/)
+        $.ajax({
+          url: "{% url 'ajax_load_videos' %}",
           data: {
-            'album': albumId       // add the country id to the GET parameters
+            'album': albumId
           },
-          success: function (data) {   // `data` is the return of the `load_cities` view function
+          success: function (data) {
             $("#album" + albumId).html(data);
-            console.log(data); // replace the contents of the city input with the data that came from the server
+            $(".delete-video").each(function () {
+               $(this).modalForm({formURL: $(this).data('id')});
+
+            });
+
+            console.log(data);
           }
         });
-
 
       });
     $("#menu-toggle").click(function(e) {
@@ -286,12 +305,13 @@ modal.find('.modal-body').load(button.data("remote"));
 
 });
 
+
     function toggle(source) {
     checkboxes = document.getElementsByName('selection');
     for(var i in checkboxes)
         checkboxes[i].checked = source.checked;
       }
-
+      //$("[name='selection']").parent().css("max-width", "56px");
       $("[name='selection']").change(function() {
         if ($("#albumTable input:checkbox:checked").length > 0) {
           $(".action-bar button").css("visibility","visible");
@@ -306,6 +326,19 @@ $(".js-upload-videos").click(function () {
   $("#fileupload" + id).click();
   $("#fileupload" + id).fileupload({
     dataType: 'json',
+    sequentialUploads: true,  /* 1. SEND THE FILES ONE BY ONE */
+   start: function (e) {  /* 2. WHEN THE UPLOADING PROCESS STARTS, SHOW THE MODAL */
+     $("#modal-progress").modal("show");
+   },
+   stop: function (e) {  /* 3. WHEN THE UPLOADING PROCESS FINALIZE, HIDE THE MODAL */
+     $("#modal-progress").modal("hide");
+   },
+   progressall: function (e, data) {  /* 4. UPDATE THE PROGRESS BAR */
+     var progress = parseInt(data.loaded / data.total * 100, 10);
+     var strProgress = progress + "%";
+     $(".progress-bar").css({"width": strProgress});
+     $(".progress-bar").text(strProgress);
+   },
     done: function (e, data) {  /* 3. PROCESS THE RESPONSE FROM THE SERVER */
       if (data.result.is_valid) {
         console.log(data.result.url);

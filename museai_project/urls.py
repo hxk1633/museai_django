@@ -30,7 +30,9 @@ urlpatterns = [
     path('myalbums/update/<int:pk>', views.AlbumUpdateView.as_view(), name='update_album'),
     path('myalbums/delete/<int:pk>', views.AlbumDeleteView.as_view(), name='delete_album'),
     path('basic-upload/<int:pk>', views.BasicUploadView.as_view(), name='basic_upload'),
-    path('ajax/load-videos/', views.load_videos, name='ajax_load_videos')
+    path('ajax/load-videos/', views.load_videos, name='ajax_load_videos'),
+    path('delete-video/<int:pk>', views.VideoDeleteView.as_view(), name='delete_video')
+    #path('move-video/<int:pk>')
 
 ]
 

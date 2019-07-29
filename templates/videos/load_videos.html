@@ -1,5 +1,7 @@
 {% for video in videos %}
-    <tr>
+  <tr>
       <td><a href="#" onclick="lightbox_open('{{ video.file.url }}');">{{ video.file.name }}</a></td>
-    </tr>
+      <td><a class='delete-video dropdown-item' data-toggle='modal'><i class="fas fa-copy"></i></i></a></td>
+      <td><a class='delete-video dropdown-item' data-toggle='modal' data-id="{% url 'delete_video' video.id %}"><i class='fa fa-trash' aria-hidden='true'></i></a></td>
+  </tr>
 {% endfor %}

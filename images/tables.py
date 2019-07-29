@@ -15,7 +15,6 @@ TEMPLATE = '''
         <a class="delete-album dropdown-item" data-toggle="modal" data-id="{% url 'delete_album' record.pk %}">Delete Album</a>
       </div>
     </div>
-
 '''
 
 UPLOAD_BUTTON = '''

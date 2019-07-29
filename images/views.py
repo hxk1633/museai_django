@@ -136,6 +136,13 @@ class VideoViewSet(viewsets.ModelViewSet):
             print(serializer.errors)
             return Response(serializer.errors)
 
+class VideoDeleteView(LoginRequiredMixin, BSModalDeleteView):
+    model = Video
+    template_name = "videos/video_confirm_delete.html"
+    success_message = 'Success: Video was deleted.'
+    success_url = reverse_lazy('albums')
+
+
 class AlbumViewSet(viewsets.ModelViewSet):
     queryset = Album.objects.all()
     serializer_class = AlbumSerializer
