@@ -30,7 +30,11 @@ ALBUM_STATUS = [
 ]
 
 def new_pin(sender, instance, **kwargs):
-    instance.pin = get_random_string(length=6).upper()
+    if instance._state.adding is True:
+        instance.pin = get_random_string(length=6).upper()
+        print("Creating an album")
+    else:
+        print("Updating an album")
 
 def file_cleanup(sender, instance, **kwargs):
     """
@@ -186,6 +190,6 @@ class Video(models.Model):
     def __str__(self):
         return self.title
 
-post_delete.connect(file_cleanup, sender=Video, dispatch_uid="video.file_cleanup")
+#post_delete.connect(file_cleanup, sender=Video, dispatch_uid="video.file_cleanup")
 post_delete.connect(file_cleanup, sender=Album, dispatch_uid="album.file_cleanup")
 pre_save.connect(new_pin, sender=Album, dispatch_uid="album.new_pin")

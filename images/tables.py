@@ -44,6 +44,7 @@ class AlbumTable(LoginRequiredMixin, tables.Table):
         row_attrs = {
             #'data-toggle': 'collapse',
             'id': lambda record: "row" + str(record.pk),
+            'data-model-status': lambda record: record.model_status
             #'class':'accordion-toggle',
         }
         attrs = {

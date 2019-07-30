@@ -24,6 +24,8 @@
   <script src="{% static 'jquery-file-upload/vendor/jquery.ui.widget.js' %}"></script>
   <script src="{% static 'jquery-file-upload/jquery.iframe-transport.js' %}"></script>
   <script src="{% static 'jquery-file-upload/jquery.fileupload.js' %}"></script>
+  <script src="https://cdn.rawgit.com/meetselva/attrchange/master/js/attrchange.js"></script>
+  <script src="https://cdn.rawgit.com/meetselva/attrchange/master/js/attrchange_ext.js"></script>
   <style>
   .fa-plus{
     position: relative;
@@ -190,6 +192,7 @@ video {
     </div>
     </div>
   </div>
+  <!--
   <div class="modal fade" id="modal-progress" data-backdrop="static" data-keyboard="false">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -204,6 +207,7 @@ video {
     </div>
   </div>
 </div>
+-->
   <div id="light">
 <a class="boxclose" id="boxclose" onclick="lightbox_close();"></a>
 <video id="VisaChipCardVideo" width="600" controls>
@@ -222,7 +226,7 @@ video {
 
   <!-- Menu Toggle Script -->
   <script>
-
+  $("tr[data-model-status='t']:nth-child(5)").html("<img src='{% static 'Vp3R.gif' %}>'");
   $("#create-album").modalForm({
        formURL: "{% url 'album_create' %}"
    });
@@ -308,17 +312,37 @@ modal.find('.modal-body').load(button.data("remote"));
 
     function toggle(source) {
     checkboxes = document.getElementsByName('selection');
-    for(var i in checkboxes)
+    for(var i in checkboxes) {
         checkboxes[i].checked = source.checked;
       }
-      //$("[name='selection']").parent().css("max-width", "56px");
-      $("[name='selection']").change(function() {
+    }
+
+      $("[name='selection'], thead input").change(function() {
         if ($("#albumTable input:checkbox:checked").length > 0) {
           $(".action-bar button").css("visibility","visible");
         }
         else {
           $(".action-bar button").css("visibility","hidden");
         }
+});
+
+$("#albumTable tr").attrchange({
+  trackValues: true, /* Default to false, if set to true the event object is
+				updated with old and new value.*/
+	callback: function (event) {
+    if ($(this).attr("data-model-status") == "s") {
+      $(this).removeClass("table-danger").addClass("table-success");
+    } else if ($(this).attr("data-model-status") == "t") {
+      $(this).removeClass("table-success").addClass("table-danger");
+    } else {
+      if($(this).hasClass("table-danger")) {
+        $(this).removeClass("table-danger");
+      } else if ($(this).hasClass("table-success")) {
+        $(this).removeClass("table-success");
+      }
+    }
+	}
+
 });
 
 $(".js-upload-videos").click(function () {
@@ -351,7 +375,6 @@ $(".js-upload-videos").click(function () {
   });
 });
 /*
-
 $("#fileupload").fileupload({
   dataType: 'json',
   done: function (e, data) {
