@@ -24,8 +24,6 @@
   <script src="{% static 'jquery-file-upload/vendor/jquery.ui.widget.js' %}"></script>
   <script src="{% static 'jquery-file-upload/jquery.iframe-transport.js' %}"></script>
   <script src="{% static 'jquery-file-upload/jquery.fileupload.js' %}"></script>
-  <script src="https://cdn.rawgit.com/meetselva/attrchange/master/js/attrchange.js"></script>
-  <script src="https://cdn.rawgit.com/meetselva/attrchange/master/js/attrchange_ext.js"></script>
   <style>
   .fa-plus{
     position: relative;
@@ -226,7 +224,8 @@ video {
 
   <!-- Menu Toggle Script -->
   <script>
-  $("tr[data-model-status='t']:nth-child(5)").html("<img src='{% static 'Vp3R.gif' %}>'");
+  $("tr[data-model-status='t']").addClass("table-success");
+  $("tr[data-model-status='s']").addClass("table-danger");
   $("#create-album").modalForm({
        formURL: "{% url 'album_create' %}"
    });
@@ -325,25 +324,42 @@ modal.find('.modal-body').load(button.data("remote"));
           $(".action-bar button").css("visibility","hidden");
         }
 });
+  /*
+      setInterval(function() {
+      ids = []
+      $("tbody").find("tr").each(function(i, el) {
+        var id = $(el).attr("id");
+        id = id.substr(3);
+        ids.push(id);
+      });
+      $.ajax({
+        url: "{% url 'ajax_get_status' %}",
+        data: {
+          'albums': JSON.stringify(ids)
+          },
+        success:
+          function(data){
+            $("tbody").find("tr").each(function(i, el) {
+              if (data[i] == "s") {
+                $(el).addClass("table-danger");
+              } else if (data[i] == "t") {
+                $(el).addClass("table-success");
+              } else {
 
-$("#albumTable tr").attrchange({
-  trackValues: true, /* Default to false, if set to true the event object is
-				updated with old and new value.*/
-	callback: function (event) {
-    if ($(this).attr("data-model-status") == "s") {
-      $(this).removeClass("table-danger").addClass("table-success");
-    } else if ($(this).attr("data-model-status") == "t") {
-      $(this).removeClass("table-success").addClass("table-danger");
-    } else {
-      if($(this).hasClass("table-danger")) {
-        $(this).removeClass("table-danger");
-      } else if ($(this).hasClass("table-success")) {
-        $(this).removeClass("table-success");
-      }
-    }
-	}
+                  $(el).removeClass("table-success");
+                  $(el).removeClass("table-danger");
 
-});
+              }
+            })
+        },
+        complete: function() {
+       // Schedule the next request when the current one's complete
+       //setInterval(sendRequest, 5000); // The interval set to 5 seconds
+       console.log(ids);
+     }
+    });
+  }, 5000);
+  */
 
 $(".js-upload-videos").click(function () {
   id = $(this).attr("data-id");
@@ -375,6 +391,7 @@ $(".js-upload-videos").click(function () {
   });
 });
 /*
+
 $("#fileupload").fileupload({
   dataType: 'json',
   done: function (e, data) {

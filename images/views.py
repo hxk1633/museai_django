@@ -30,6 +30,8 @@ from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt
 from images.tasks import new_model
 from django.utils.decorators import method_decorator
+from django.http import HttpResponse
+
 
 
 
@@ -153,3 +155,14 @@ def load_videos(request):
     videos = Video.objects.filter(album_id=album_id).order_by('title')
     print(videos)
     return render(request, 'videos/load_videos.html', {'videos': videos})
+
+def get_status(request):
+    albums_id = json.loads(request.GET.get('albums'))
+    print(albums_id)
+    model_statuses = []
+    for id in albums_id:
+        print(id)
+        status = Album.objects.get(id=int(id)).model_status
+        model_statuses.append(status)
+    print(model_statuses)
+    return HttpResponse(json.dumps(model_statuses), content_type='application/json')

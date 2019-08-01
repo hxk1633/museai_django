@@ -42,10 +42,8 @@ class AlbumTable(LoginRequiredMixin, tables.Table):
         sequence = ('selection', 'name', 'description', 'pin', 'status', 'model_status', 'upload', 'actions')
         exclude = ('id', 'organization',)
         row_attrs = {
-            #'data-toggle': 'collapse',
             'id': lambda record: "row" + str(record.pk),
-            'data-model-status': lambda record: record.model_status
-            #'class':'accordion-toggle',
+            'data-model-status': lambda record: record.model_status,
         }
         attrs = {
             'id': 'albumTable',

@@ -10,7 +10,7 @@ import uuid
 import zipfile
 from celery import Celery
 import json
-import images.make_json_serializable   # apply monkey-patch
+import images.make_json_serializable
 from functools import partial
 from django.db import models
 from django.db.models.signals import post_delete, pre_save
@@ -47,6 +47,7 @@ def file_cleanup(sender, instance, **kwargs):
     >>> post_delete.connect(file_cleanup, sender=MyModel, dispatch_uid="mymodel.file_cleanup")
     """
     if isinstance(instance, Video):
+        print("instance:" + str(instance))
         path = instance.getFilePath()
         os.remove(path)
         print(instance.getAlbumName())
@@ -59,7 +60,7 @@ def file_cleanup(sender, instance, **kwargs):
         os.remove(basePath + instance.getFileName() + ".zip")
         os.rmdir(dirPath)
     elif isinstance(instance, Album):
-        os.rmdir("media/albums/" + instance.name + "/data/images/")
+        os.system("sudo rm -R " + "media/albums/" + instance.name + "/data/*")
         os.rmdir("media/albums/" + instance.name + "/data/")
         os.rmdir("media/albums/" + instance.name + "/")
 
@@ -190,6 +191,6 @@ class Video(models.Model):
     def __str__(self):
         return self.title
 
-#post_delete.connect(file_cleanup, sender=Video, dispatch_uid="video.file_cleanup")
+post_delete.connect(file_cleanup, sender=Video, dispatch_uid="video.file_cleanup")
 post_delete.connect(file_cleanup, sender=Album, dispatch_uid="album.file_cleanup")
 pre_save.connect(new_pin, sender=Album, dispatch_uid="album.new_pin")
