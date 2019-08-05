@@ -19,7 +19,7 @@ def new_model(album_id):
     #gpu_machine = ["", "", ""]
     system_clean = ["docker", "system", "prune", "-a"]
     build_cmd = ["docker", "build", "-t", "model-builder", "."]
-    run_cmd = ["docker", "run", "-v", "/home/harrison/Desktop/museai_django/media/albums/" + album.name + "/data:/data", "-it", "model-builder"]
+    run_cmd = ["docker", "run", "-v", "/home/django/museai_django/media/albums/" + album.name + "/data:/data", "-it", "model-builder"]
     Album.objects.filter(name=album.name).update(model_status='t')
     build = Popen(build_cmd, stdout=PIPE)
     run = Popen(run_cmd, stdout=PIPE)
