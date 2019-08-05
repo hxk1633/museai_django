@@ -56,12 +56,12 @@ def file_cleanup(sender, instance, **kwargs):
             basePath = "media/albums/" + instance.getAlbumName() + "/data/images/"
             dirPath = "media/albums/" + instance.getAlbumName() + "/data/images/" + instance.getFileName()
             fileList = os.listdir(dirPath)
+            for fileName in fileList:
+                os.remove(dirPath+"/"+fileName)
+            os.remove(basePath + instance.getFileName() + ".zip")
+            os.rmdir(dirPath)
         except:
             pass
-        for fileName in fileList:
-            os.remove(dirPath+"/"+fileName)
-        os.remove(basePath + instance.getFileName() + ".zip")
-        os.rmdir(dirPath)
     elif isinstance(instance, Album):
         try:
             os.system("sudo rm -R " + "media/albums/" + instance.name + "/data/*")
