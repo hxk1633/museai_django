@@ -162,7 +162,7 @@ def get_status(request):
     model_statuses = []
     for id in albums_id:
         print("id (get-status)" + str(id))
-        status = Album.objects.get(id=int(id)).model_status
+        status = Album.objects.get(pk=int(id)).model_status
         model_statuses.append(status)
     print(model_statuses)
     return HttpResponse(json.dumps(model_statuses), content_type='application/json')
