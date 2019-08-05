@@ -47,22 +47,28 @@ def file_cleanup(sender, instance, **kwargs):
     >>> post_delete.connect(file_cleanup, sender=MyModel, dispatch_uid="mymodel.file_cleanup")
     """
     if isinstance(instance, Video):
-        print("instance:" + str(instance))
-        path = instance.getFilePath()
-        os.remove(path)
-        print(instance.getAlbumName())
-        print(instance.getFileName())
-        basePath = "media/albums/" + instance.getAlbumName() + "/data/images/"
-        dirPath = "media/albums/" + instance.getAlbumName() + "/data/images/" + instance.getFileName()
-        fileList = os.listdir(dirPath)
+        try:
+            print("instance:" + str(instance))
+            path = instance.getFilePath()
+            os.remove(path)
+            print(instance.getAlbumName())
+            print(instance.getFileName())
+            basePath = "media/albums/" + instance.getAlbumName() + "/data/images/"
+            dirPath = "media/albums/" + instance.getAlbumName() + "/data/images/" + instance.getFileName()
+            fileList = os.listdir(dirPath)
+        except:
+            pass
         for fileName in fileList:
             os.remove(dirPath+"/"+fileName)
         os.remove(basePath + instance.getFileName() + ".zip")
         os.rmdir(dirPath)
     elif isinstance(instance, Album):
-        os.system("sudo rm -R " + "media/albums/" + instance.name + "/data/*")
-        os.rmdir("media/albums/" + instance.name + "/data/")
-        os.rmdir("media/albums/" + instance.name + "/")
+        try:
+            os.system("sudo rm -R " + "media/albums/" + instance.name + "/data/*")
+            os.rmdir("media/albums/" + instance.name + "/data/")
+            os.rmdir("media/albums/" + instance.name + "/")
+        except:
+            pass
 
 
 

@@ -226,6 +226,7 @@ video {
   <script>
   $("tr[data-model-status='t']").addClass("table-success");
   $("tr[data-model-status='s']").addClass("table-danger");
+  $("tr[data-model-status='t']").find('td:eq(5)').append("<img style=' margin-left: 7px; width: 25px; height: 25px;' src='{% static 'Gear-3.4s-200px.gif' %}'>");
   $("#create-album").modalForm({
        formURL: "{% url 'album_create' %}"
    });
@@ -324,7 +325,7 @@ modal.find('.modal-body').load(button.data("remote"));
           $(".action-bar button").css("visibility","hidden");
         }
 });
-  /*
+  
       setInterval(function() {
       ids = []
       $("tbody").find("tr").each(function(i, el) {
@@ -341,14 +342,22 @@ modal.find('.modal-body').load(button.data("remote"));
           function(data){
             $("tbody").find("tr").each(function(i, el) {
               if (data[i] == "s") {
+                $(el).removeClass("table-success");
                 $(el).addClass("table-danger");
+                $(el).find('td:eq(5)').text("Not trained");
+                console.log("not trained");
               } else if (data[i] == "t") {
+                $(el).removeClass("table-danger");
                 $(el).addClass("table-success");
+                $(el).find('td:eq(5)').html("Training <img style=' margin-left: 10px; width: 25px; height: 25px;' src='{% static 'Gear-3.4s-200px.gif' %}'>");
+                //$(el).find('td:eq(5)').append("<img style=' margin-left: 5px; width: 30px; height: 30px;' src='{% static 'Gear-3.4s-200px.gif' %}'>");
+                console.log("training");
               } else {
-
+                  console.log("created");
+                  $(el).find('td:eq(5)').text("Created");
                   $(el).removeClass("table-success");
                   $(el).removeClass("table-danger");
-
+                  $(el).find('td:eq(5)').find("img").css("display", "none");
               }
             })
         },
@@ -359,7 +368,8 @@ modal.find('.modal-body').load(button.data("remote"));
      }
     });
   }, 5000);
-  */
+
+
 
 $(".js-upload-videos").click(function () {
   id = $(this).attr("data-id");
