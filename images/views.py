@@ -158,10 +158,10 @@ def load_videos(request):
 
 def get_status(request):
     albums_id = json.loads(request.GET.get('albums'))
-    print(albums_id)
+    print("id-list (get-status)" + str(albums_id))
     model_statuses = []
     for id in albums_id:
-        print(id)
+        print("id (get-status)" + str(id))
         status = Album.objects.get(id=int(id)).model_status
         model_statuses.append(status)
     print(model_statuses)
