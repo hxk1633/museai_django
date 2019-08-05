@@ -177,6 +177,18 @@ video {
         <button type="submit" name="delete" class="btn btn-primary">Delete Album</button>
         <button type="button" class="btn btn-primary">Merge Albums</button>
         <button type="submit" name="train" class="btn btn-primary">Train Album</button>
+        {% block alert %}
+        {% if messages %}
+        <ul class="messages">
+          {% for message in messages %}
+          <div id="train-danger" class="alert alert-danger alert-dismissible">
+            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+            {{ message }}
+          </div>
+          {% endfor %}
+        </ul>
+        {% endif %}
+        {% endblock %}
       </div>
       <div class="container-fluid">
         {% block content %}
@@ -218,6 +230,7 @@ video {
     <!-- /#page-content-wrapper -->
 
   </div>
+
   <!-- /#wrapper -->
 
   <!-- Bootstrap core JavaScript -->
@@ -271,6 +284,7 @@ function lightbox_close() {
            $(el).find("#viewAlbum").attr("href", "#album" + id);
            $(el).after("<tbody data-videos-url='{% url 'ajax_load_videos' %}' id='album"+id+"' class='videos accordion-body collapse'></tbody>");
     });
+
     $("a#viewAlbum").click(function () {
         var albumId = $(this).attr('href');
         albumId = albumId.substr(6);
@@ -325,7 +339,7 @@ modal.find('.modal-body').load(button.data("remote"));
           $(".action-bar button").css("visibility","hidden");
         }
 });
-  
+
       setInterval(function() {
       ids = []
       $("tbody").find("tr").each(function(i, el) {

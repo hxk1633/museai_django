@@ -31,6 +31,8 @@ from django.views.decorators.csrf import csrf_exempt
 from images.tasks import new_model
 from django.utils.decorators import method_decorator
 from django.http import HttpResponse
+from django.contrib import messages
+
 
 
 
@@ -53,11 +55,18 @@ def Albums_Actions(request, id=None):
             return HttpResponseRedirect(reverse_lazy('albums'))
         elif 'train' in request.POST:
             id_list = request.POST.getlist('selection')
-            print("id list" + str(id_list))
-            for album_id in id_list:
-                album = Album.objects.get(pk=album_id)
-                new_model.apply_async(args=[album.id], countdown=5)
-            return HttpResponseRedirect(reverse_lazy('albums'))
+            print("train-button: " + str(id_list[0]))
+            videos = Video.objects.filter(album_id=int(id_list[0]))
+            if len(videos) >= 2:
+                print("id list" + str(id_list))
+                for album_id in id_list:
+                    album = Album.objects.get(pk=album_id)
+                    new_model.apply_async(args=[album.id], countdown=5)
+                return HttpResponseRedirect(reverse_lazy('albums'))
+            else:
+                messages.success(request, "Action not permitted You must upload at least two videos to an album to train.")
+                return HttpResponseRedirect(reverse_lazy('albums'))
+
 
 def get_context_data(self, **kwargs):
     context = super().get_context_data(**kwargs)
