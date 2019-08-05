@@ -53,7 +53,7 @@ def Albums_Actions(request, id=None):
             return HttpResponseRedirect(reverse_lazy('albums'))
         elif 'train' in request.POST:
             id_list = request.POST.getlist('selection')
-            print(id_list)
+            print("id list" + str(id_list))
             for album_id in id_list:
                 album = Album.objects.get(pk=album_id)
                 new_model.apply_async(args=[album.id], countdown=5)
