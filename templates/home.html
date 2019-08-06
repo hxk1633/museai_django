@@ -11,7 +11,7 @@
 
   <title>Museai Vision</title>
 
-  <!-- Bootstrap core CSS -->
+
   <link href="{% static 'bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
 
   <!-- Custom styles for this template -->
@@ -117,6 +117,10 @@ video {
 .alert {
   margin:10px;
 }
+#upload-progress {
+  display: none;
+  margin: 10px;
+}
   </style>
 </head>
 
@@ -177,6 +181,12 @@ video {
       </nav>
       <form action="{% url 'actions-albums' %}" method="POST">
       <div class="action-bar container-fluid">
+        <div id="upload-progress">
+        <h6>Uploading...</h6>
+        <div class="progress">
+          <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>
+        </div>
+      </div>
         <button type="submit" name="delete" class="btn btn-primary">Delete Album</button>
         <!--<button type="button" class="btn btn-primary">Merge Albums</button>-->
         <button type="submit" name="train" class="btn btn-primary">Train Album</button>
@@ -212,22 +222,6 @@ video {
     </div>
     </div>
   </div>
-  <!--
-  <div class="modal fade" id="modal-progress" data-backdrop="static" data-keyboard="false">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h4 class="modal-title">Uploading...</h4>
-      </div>
-      <div class="modal-body">
-        <div class="progress">
-          <div class="progress-bar" role="progressbar" style="width: 0%;">0%</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
--->
   <div id="light">
 <a class="boxclose" id="boxclose" onclick="lightbox_close();"></a>
 <video id="VisaChipCardVideo" width="600" controls>
@@ -402,10 +396,10 @@ $(".js-upload-videos").click(function () {
     dataType: 'json',
     sequentialUploads: true,  /* 1. SEND THE FILES ONE BY ONE */
    start: function (e) {  /* 2. WHEN THE UPLOADING PROCESS STARTS, SHOW THE MODAL */
-     $("#modal-progress").modal("show");
+     $("#upload-progress").css("display", "block");
    },
    stop: function (e) {  /* 3. WHEN THE UPLOADING PROCESS FINALIZE, HIDE THE MODAL */
-     $("#modal-progress").modal("hide");
+     $("#upload-progress").css("display", "none");
    },
    progressall: function (e, data) {  /* 4. UPDATE THE PROGRESS BAR */
      var progress = parseInt(data.loaded / data.total * 100, 10);
