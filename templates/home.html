@@ -114,6 +114,9 @@ video {
   margin: 10px;
   visibility: hidden;
 }
+.alert {
+  margin:10px;
+}
   </style>
 </head>
 
@@ -181,10 +184,17 @@ video {
         {% if messages %}
         <ul class="messages">
           {% for message in messages %}
-          <div id="train-danger" class="alert alert-danger alert-dismissible">
+           {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
+          <div class="alert alert-danger alert-dismissible fade show">
             <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
             {{ message }}
           </div>
+          {% elif message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}
+          <div class="alert alert-success alert-dismissible fade show">
+            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+            {{ message }}
+          </div>
+          {% endif %}
           {% endfor %}
         </ul>
         {% endif %}

@@ -34,9 +34,6 @@ from django.http import HttpResponse
 from django.contrib import messages
 
 
-
-
-
 @login_required
 def albums(request):
     table = AlbumTable(Album.objects.filter(organization=request.user).order_by('name'))
@@ -64,7 +61,7 @@ def Albums_Actions(request, id=None):
                     new_model.apply_async(args=[album.id], countdown=5)
                 return HttpResponseRedirect(reverse_lazy('albums'))
             else:
-                messages.success(request, "Action not permitted You must upload at least two videos to an album to train.")
+                messages.error(request, "Action not permitted! You must upload at least two videos to an album to train.")
                 return HttpResponseRedirect(reverse_lazy('albums'))
 
 
