@@ -4,6 +4,7 @@ from django.utils.crypto import get_random_string
 from images.models import Album, TFModel
 import time
 import os
+import json
 from subprocess import Popen, PIPE
 
 @shared_task
