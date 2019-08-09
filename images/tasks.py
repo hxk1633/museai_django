@@ -37,9 +37,8 @@ def new_model(album_id):
     with open('/media/albums/classes.json') as f:
         data = json.load(f)
     data.update(new_model)
-
-with open('/home/harrison/Desktop/museai_django/media/albums/classes.json', 'w') as f:
-    json.dump(data, f)
+    with open('/home/harrison/Desktop/museai_django/media/albums/classes.json', 'w') as f:
+        json.dump(data, f)
 
 @shared_task
 def visualize_data():
