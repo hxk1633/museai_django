@@ -28,6 +28,17 @@ def new_model(album_id):
     print(run.communicate())
     Album.objects.filter(pk=album_id).update(model_status='c')
     tfmodel = TFModel.objects.create(name=album.name, album_model=album)
+    file = open('/home/harrison/Desktop/museai_django/media/albums/'+ album.name +'/data/output_labels.txt', 'r')
+    labels = []
+    for line in file:
+        labels.append(line.strip())
+    new_model = {"name": album.name, "labels": labels}
+    with open('/home/harrison/Desktop/museai_django/media/albums/classes.json') as f:
+        data = json.load(f)
+    data.update(new_model)
+
+with open('/home/harrison/Desktop/museai_django/media/albums/classes.json', 'w') as f:
+    json.dump(data, f)
 
 @shared_task
 def visualize_data():
