@@ -27,9 +27,16 @@ UPLOAD_BUTTON = '''
    data-form-data='{"csrfmiddlewaretoken": "{{ csrf_token }}"}'>
 '''
 
+TEST_MODEL = '''
+<a class="btn btn-light" href="http://134.209.122.121/viewer?album={{record.name}}&debug=true" target="_blank">
+    <i class="fas fa-eye"></i>
+</a>
+'''
+
 class AlbumTable(LoginRequiredMixin, tables.Table):
     actions = tables.TemplateColumn(TEMPLATE, orderable=False)
     upload = tables.TemplateColumn(UPLOAD_BUTTON, orderable=False)
+    test = tables.TemplateColumn(TEST_MODEL, orderable=False)
     selection = tables.CheckBoxColumn(accessor='pk', attrs = { "th__input":
                                         {"onclick": "toggle(this)"}}, orderable=False)
 
@@ -39,7 +46,7 @@ class AlbumTable(LoginRequiredMixin, tables.Table):
     class Meta:
         model = Album
         template_name = 'django_tables2/bootstrap.html'
-        sequence = ('selection', 'name', 'description', 'pin', 'status', 'model_status', 'upload', 'actions')
+        sequence = ('selection', 'name', 'description', 'pin', 'status', 'model_status', 'upload', 'actions', 'test')
         exclude = ('id', 'organization',)
         row_attrs = {
             'id': lambda record: "row" + str(record.pk),

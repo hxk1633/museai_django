@@ -65,8 +65,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_celery_beat',
     'django_tables2',
-    'bootstrap_modal_forms',
-    'qr_code'
+    'bootstrap_modal_forms'
 ]
 
 MIDDLEWARE = [
