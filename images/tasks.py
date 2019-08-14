@@ -18,6 +18,10 @@ def new_pins():
 def new_model(album_id):
     print("training model " + str(album_id))
     album = Album.objects.get(id=album_id)
+    os.system("cd /home/django/museai_django/media/albums/"+ album.name + "/data/")
+    if os.path.isdir("/home/django/museai_django/media/albums/"+ album.name + "/data/saved_model_web") == False:
+        print("removing old model files...")
+        os.system("rm -R !(images)")
     system_clean = ["docker", "system", "prune", "-a"]
     build_cmd = ["docker", "build", "-t", "model-builder", "."]
     run_cmd = ["docker", "run", "-v", "/home/django/museai_django/media/albums/" + album.name + "/data:/data", "-it", "model-builder"]
