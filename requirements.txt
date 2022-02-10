@@ -2,7 +2,7 @@ amqp==2.5.0
 billiard==3.6.0.0
 celery==4.3.0
 Click==7.0
-Django==2.2.2
+Django==2.2.27
 django-celery-results==1.1.2
 djangorestframework==3.9.4
 django_celery_beat
